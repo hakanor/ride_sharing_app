@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:ride_sharing_app/Screens/LoginPage.dart';
+import 'package:ride_sharing_app/Screens/Login%20Screens/LoginPage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
@@ -17,7 +17,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Araç Paylaşım Uygulaması',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

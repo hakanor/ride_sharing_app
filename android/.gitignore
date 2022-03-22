@@ -12,3 +12,5 @@ android/app/src/main/res/values/keys.xml
 key.properties
 **/*.keystore
 **/*.jks
+
+keys.xml

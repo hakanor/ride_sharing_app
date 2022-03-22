@@ -1,7 +1,10 @@
+import 'package:ride_sharing_app/Screens/Login%20Screens/PasswordResetPage.dart';
 import 'package:ride_sharing_app/Services/auth_service.dart';
-import 'package:ride_sharing_app/Screens/RegisterPage.dart';
+import 'package:ride_sharing_app/Screens/Login%20Screens/RegisterPage.dart';
 import 'package:flutter/material.dart';
-import 'MyHomePage.dart';
+import '../MyHomePage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -13,6 +16,19 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
 
   AuthService _authService = AuthService();
+
+  Future <void> girisyap() async {
+    try{
+      await FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _passwordController.text)
+          .then((kullanici) {
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=> MyHomePage(title: 'Araç Paylaşım',)),(Route<dynamic>route)=>false);
+      }).whenComplete(() => print("Giriş Yapıldı"));
+    } on FirebaseAuthException catch(error){
+      String? error_message=error.message;
+      Fluttertoast.showToast(msg: "Error : $error_message");
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -123,20 +139,29 @@ class _LoginPageState extends State<LoginPage> {
                                         color: Colors.white,
                                       )),
                                 )),
+
                             SizedBox(
-                              height: size.height * 0.08,
+                              height: size.height * 0.04,
                             ),
+
+
+
                             InkWell(
                               onTap: () {
+                                girisyap();
+                                /*
                                 _authService
                                     .signIn(
                                     _emailController.text, _passwordController.text)
                                     .then((value) {
-                                  return Navigator.push(
+                                  return Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => MyHomePage(title: "Araç Paylaşım Uygulaması")));
-                                });
+                                });*/
+
+
+
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(vertical: 5),
@@ -157,6 +182,26 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                             ),
+
+
+                            SizedBox(
+                              height: size.height * 0.02,
+                            ),
+
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ForgotPassword()));
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 5),
+
+                                child: Text("Şifremi unuttum?",style: TextStyle(color: Colors.white),),
+                              ),
+                            ),
+
                             SizedBox(
                               height: size.height * 0.02,
                             ),

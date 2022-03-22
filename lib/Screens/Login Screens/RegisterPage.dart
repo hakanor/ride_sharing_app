@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ride_sharing_app/Services/auth_service.dart';
-import 'package:ride_sharing_app/Screens/LoginPage.dart';
+import 'package:ride_sharing_app/Screens/Login%20Screens/LoginPage.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -13,7 +16,47 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordAgainController = TextEditingController();
 
-  AuthService _authService = AuthService();
+  //AuthService _authService = AuthService();
+
+  /*
+  // TOAST KULLANABİLMEK İÇİN FONKSİYONLARI BURAYA ALMAK ZORUNDA KALDIM
+  Future <void> kayitol() async{
+    try{
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _emailController.text,password: _passwordController.text,)
+          .then((kullanici){
+        FirebaseFirestore.instance.collection("Kullanicilar").doc(FirebaseAuth.instance.currentUser?.uid).set({
+          'KullaniciEposta':_emailController.text,
+          'KullaniciSifre':_passwordController.text,
+        }).whenComplete(() => print("Kullanıcı Firestore veritabanına eklendi"));
+      }).whenComplete(() => print("Kullanıcı Firebase'e kaydedildi."));
+    } on FirebaseAuthException catch(error){
+      String? error_message=error.message;
+      Fluttertoast.showToast(msg: "Error : $error_message");
+    }
+  }*/
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<User?> createPerson(String name, String email, String password) async {
+    try{
+      var user = await _auth.createUserWithEmailAndPassword(
+          email: email,
+          password: password);
+
+      await _firestore
+          .collection("Users")
+          .doc(user.user!.uid)
+          .set({'userName': name, 'email': email,'password':password});
+
+      return user.user;
+
+    } on FirebaseAuthException catch(error){
+      String? error_message=error.message;
+      Fluttertoast.showToast(msg: "Error : $error_message");
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -156,11 +199,16 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                           InkWell(
                             onTap: () {
+                              createPerson(
+                                  _nameController.text,
+                                  _emailController.text,
+                                  _passwordController.text)
+                              /*
                               _authService
                                   .createPerson(
                                   _nameController.text,
                                   _emailController.text,
-                                  _passwordController.text)
+                                  _passwordController.text)*/
                                   .then((value) {
                                 return Navigator.push(
                                     context,
