@@ -15,26 +15,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordAgainController = TextEditingController();
-
-  //AuthService _authService = AuthService();
-
-  /*
-  // TOAST KULLANABİLMEK İÇİN FONKSİYONLARI BURAYA ALMAK ZORUNDA KALDIM
-  Future <void> kayitol() async{
-    try{
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _emailController.text,password: _passwordController.text,)
-          .then((kullanici){
-        FirebaseFirestore.instance.collection("Kullanicilar").doc(FirebaseAuth.instance.currentUser?.uid).set({
-          'KullaniciEposta':_emailController.text,
-          'KullaniciSifre':_passwordController.text,
-        }).whenComplete(() => print("Kullanıcı Firestore veritabanına eklendi"));
-      }).whenComplete(() => print("Kullanıcı Firebase'e kaydedildi."));
-    } on FirebaseAuthException catch(error){
-      String? error_message=error.message;
-      Fluttertoast.showToast(msg: "Error : $error_message");
-    }
-  }*/
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -203,12 +183,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                   _nameController.text,
                                   _emailController.text,
                                   _passwordController.text)
-                              /*
-                              _authService
-                                  .createPerson(
-                                  _nameController.text,
-                                  _emailController.text,
-                                  _passwordController.text)*/
                                   .then((value) {
                                 return Navigator.push(
                                     context,
@@ -220,7 +194,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               padding: EdgeInsets.symmetric(vertical: 5),
                               decoration: BoxDecoration(
                                   border: Border.all(color: Colors.white, width: 2),
-                                  //color: colorPrimaryShade,
+                                  color: Colors.white,
                                   borderRadius:
                                   BorderRadius.all(Radius.circular(30))),
                               child: Padding(
@@ -229,7 +203,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     child: Text(
                                       "Kaydet",
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: Colors.blue,
                                         fontSize: 20,
                                       ),
                                     )),

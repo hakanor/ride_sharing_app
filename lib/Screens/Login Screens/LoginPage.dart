@@ -29,7 +29,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -145,29 +144,16 @@ class _LoginPageState extends State<LoginPage> {
                             ),
 
 
-
                             InkWell(
                               onTap: () {
                                 girisyap();
-                                /*
-                                _authService
-                                    .signIn(
-                                    _emailController.text, _passwordController.text)
-                                    .then((value) {
-                                  return Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => MyHomePage(title: "Araç Paylaşım Uygulaması")));
-                                });*/
-
-
 
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(vertical: 5),
                                 decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.white, width: 2),
-                                    //color: colorPrimaryShade,
+                                    border: Border.all(color: Colors.white, width: 1),
+                                    color: Colors.white,
                                     borderRadius: BorderRadius.all(Radius.circular(30))),
                                 child: Padding(
                                   padding: const EdgeInsets.all(5.0),
@@ -175,7 +161,38 @@ class _LoginPageState extends State<LoginPage> {
                                       child: Text(
                                         "Giriş yap",
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: Colors.blue,
+                                          fontSize: 20,
+                                        ),
+                                      )),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(
+                              height: size.height * 0.02,
+                            ),
+
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => RegisterPage()));
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 5),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.white, width: 1),
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.all(Radius.circular(30))),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Center(
+                                      child: Text(
+                                        "Kayıt Ol",
+                                        style: TextStyle(
+                                          color: Colors.blue,
                                           fontSize: 20,
                                         ),
                                       )),
@@ -201,37 +218,6 @@ class _LoginPageState extends State<LoginPage> {
                                 child: Text("Şifremi unuttum?",style: TextStyle(color: Colors.white),),
                               ),
                             ),
-
-                            SizedBox(
-                              height: size.height * 0.02,
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => RegisterPage()));
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Container(
-                                    height: 1,
-                                    width: 75,
-                                    color: Colors.white,
-                                  ),
-                                  Text(
-                                    "Kayıt ol",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  Container(
-                                    height: 1,
-                                    width: 75,
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              ),
-                            )
                           ],
                         ),
                       ),

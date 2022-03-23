@@ -47,35 +47,21 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
 
       body:_children[_currentIndex],
-      /*
-      body: Container(
-        color: Colors.white30,
-        child:Center(
-          child: ElevatedButton(
-            child: Text("İlan Ekle"),
-            onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => test_screen()));
-            },
-          ),
-        ),
-      ),
-
-       */
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap:onTabTapped,
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: "Ana Sayfa",
+              icon: Icon(Icons.explore),
+              label: "Tüm İlanlar",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
+            icon: Icon(Icons.assignment),
             label: "İlanlarım",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_box),
+            icon: Icon(Icons.account_circle),
             label: "Profilim",
           ),
 

@@ -97,7 +97,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                               padding: EdgeInsets.symmetric(vertical: 5),
                               decoration: BoxDecoration(
                                   border: Border.all(color: Colors.white, width: 2),
-                                  //color: colorPrimaryShade,
+                                  color: Colors.white,
                                   borderRadius:
                                   BorderRadius.all(Radius.circular(30))),
                               child: Padding(
@@ -106,7 +106,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                     child: Text(
                                       "Şifremi Sıfırla",
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: Colors.blue,
                                         fontSize: 20,
                                       ),
                                     )),
