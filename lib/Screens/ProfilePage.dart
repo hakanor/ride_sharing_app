@@ -19,7 +19,6 @@ class _ProfilePageState  extends State<ProfilePage> {
   FirebaseFirestore.instance.collection('Users');
   String? userid= FirebaseAuth.instance.currentUser?.uid;
 
-
   @override
   Widget build(BuildContext context) {
 
@@ -210,6 +209,7 @@ Widget buildShowUserNameAndEmailWithoutIcon(
 
 class NameChangePage extends StatelessWidget {
   NameChangePage({Key? key,this.userid2}) : super(key: key);
+  final GlobalKey<FormState> _key = GlobalKey<FormState>();
   final userid2;
   final TextEditingController textEditingControllername = TextEditingController();
   final TextEditingController textEditingControllersurname = TextEditingController();
@@ -226,89 +226,104 @@ class NameChangePage extends StatelessWidget {
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+            child: Form(
+              key: _key,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
 
-                SizedBox(height: MediaQuery.of(context).size.height * 0.08),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.08),
 
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade400,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Text(
-                          "Yeni isim:",
-                          style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w400,fontSize: 14),),
-                      ),
-                      TextField(
-                        keyboardType: TextInputType.text,
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          hintText: "Yeni isim giriniz."
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade400,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            "Yeni isim:",
+                            style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w400,fontSize: 14),),
                         ),
-                        controller: textEditingControllername,
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade400,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Text(
-                          "Yeni soyisim:",
-                          style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w400,fontSize: 14),),
-                      ),
-                      TextField(
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                            hintText: "Yeni soyisim giriniz."
+                        TextFormField(
+                          keyboardType: TextInputType.text,
+                          style: TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: "Yeni isim giriniz."
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) return 'Alan boş bırakılamaz.';
+                            return null;
+                          },
+                          controller: textEditingControllername,
                         ),
-                        controller: textEditingControllersurname,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
 
-                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
 
-                ElevatedButton(onPressed: (){
-                  try{
-                    FirebaseFirestore.instance
-                        .collection('Users')
-                        .doc(userid)
-                        .update({'name':textEditingControllername.text,'surname':textEditingControllersurname.text,}).whenComplete((){
-                      Fluttertoast.showToast(msg: "Güncelleme Başarılı");
-                      Navigator.pop(context);
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade400,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            "Yeni soyisim:",
+                            style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w400,fontSize: 14),),
+                        ),
+                        TextFormField(
+                          style: TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                              hintText: "Yeni soyisim giriniz."
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) return 'Alan boş bırakılamaz.';
+                            return null;
+                          },
+                          controller: textEditingControllersurname,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+
+                  ElevatedButton(onPressed: (){
+                    if (_key.currentState!.validate()) {
+                      _key.currentState!.save();
+                      try{
+                        FirebaseFirestore.instance
+                            .collection('Users')
+                            .doc(userid)
+                            .update({'name':textEditingControllername.text,'surname':textEditingControllersurname.text,}).whenComplete((){
+                          Fluttertoast.showToast(msg: "Güncelleme Başarılı");
+                          Navigator.pop(context);
                         });
-                  }on FirebaseAuthException catch(error){
-                    String? error_message=error.message;
-                    Fluttertoast.showToast(msg: "Error : $error_message");
-                  }
-                }, child: Text("Kaydet")),
+                      }on FirebaseAuthException catch(error){
+                        String? error_message=error.message;
+                        Fluttertoast.showToast(msg: "Error : $error_message");
+                      }
+                    }
 
-              ],
+                  }, child: Text("Kaydet")),
+
+                ],
+              ),
             ),
           )
         ),
@@ -319,6 +334,7 @@ class NameChangePage extends StatelessWidget {
 
 class NumberChangePage extends StatelessWidget {
   NumberChangePage({Key? key, this.userid2}) : super(key: key);
+  final GlobalKey<FormState> _key = GlobalKey<FormState>();
   final String? userid2;
   final TextEditingController textEditingControllernumber = TextEditingController();
   @override
@@ -331,61 +347,73 @@ class NumberChangePage extends StatelessWidget {
       body: Center(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+            child: Form(
+              key: _key,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
 
-                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
 
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade400,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Text(
-                          "Yeni numara:",
-                          style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w400,fontSize: 14),),
-                      ),
-                      TextField(
-                        maxLength: 11,
-                        keyboardType: TextInputType.number,
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                            hintText: "05338889944 şeklinde",
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade400,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            "Yeni numara:",
+                            style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w400,fontSize: 14),),
                         ),
-                        controller: textEditingControllernumber,
-                      ),
-                    ],
+                        TextFormField(
+                          maxLength: 11,
+                          keyboardType: TextInputType.number,
+                          style: TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                              hintText: "05338889944 şeklinde",
+                          ),
+                          controller: textEditingControllernumber,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) return 'Alan boş bırakılamaz.';
+                            else if (value.length != 11) return 'Numara 11 haneli olmalıdır.';
+                            else return null;
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
 
-                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
 
-                ElevatedButton(onPressed: (){
-                  try{
-                    FirebaseFirestore.instance
-                        .collection('Users')
-                        .doc(userid)
-                        .update({'number':textEditingControllernumber.text,}).whenComplete((){
-                      Fluttertoast.showToast(msg: "Güncelleme Başarılı");
-                      Navigator.pop(context);}
-                    );
-                  }on FirebaseAuthException catch(error){
-                    String? error_message=error.message;
-                    Fluttertoast.showToast(msg: "Error : $error_message");
-                  }
+                  ElevatedButton(onPressed: (){
+                    if(_key.currentState!.validate()){
+                      _key.currentState!.save();
 
-                }, child: Text("Kaydet")),
+                      try{
+                        FirebaseFirestore.instance
+                            .collection('Users')
+                            .doc(userid)
+                            .update({'number':textEditingControllernumber.text,}).whenComplete((){
+                          Fluttertoast.showToast(msg: "Güncelleme Başarılı");
+                          Navigator.pop(context);}
+                        );
+                      }on FirebaseAuthException catch(error){
+                        String? error_message=error.message;
+                        Fluttertoast.showToast(msg: "Error : $error_message");
+                      }
+                    }
 
-              ],
+                  }, child: Text("Kaydet")),
+
+                ],
+              ),
             ),
           )
       ),
