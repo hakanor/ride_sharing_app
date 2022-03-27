@@ -13,14 +13,12 @@ class AuthService {
     return user.user;
   }
 
-
   //çıkış yap fonksiyonu
   signOut() async {
     return await _auth.signOut();
   }
 
   //kayıt ol fonksiyonu
-
   Future<User?> createPerson(String name,String surname,String number, String email, String password) async {
     try{
       var user = await _auth.createUserWithEmailAndPassword(

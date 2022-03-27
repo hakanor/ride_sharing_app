@@ -100,7 +100,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                     Fluttertoast.showToast(msg: "Error : $error_message");
                                   }
                                 }
-                                
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(vertical: 5),

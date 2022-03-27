@@ -117,8 +117,6 @@ class _ProfilePageState  extends State<ProfilePage> {
                     ),
                   ),
                   SizedBox(height:MediaQuery.of(context).size.height* 0.03),
-
-                  ElevatedButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context) => NumberChangePage(userid2: userid,)));}, child: Text("Test")),
                 ],
               ),
             );
