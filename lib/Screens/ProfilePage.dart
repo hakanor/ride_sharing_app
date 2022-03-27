@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ProfilePage extends StatefulWidget {
 
@@ -17,6 +17,7 @@ class _ProfilePageState  extends State<ProfilePage> {
   User? user = FirebaseAuth.instance.currentUser;
   CollectionReference usersCollection =
   FirebaseFirestore.instance.collection('Users');
+  String? userid= FirebaseAuth.instance.currentUser?.uid;
 
 
   @override
@@ -92,29 +93,33 @@ class _ProfilePageState  extends State<ProfilePage> {
                     child: buildShowUserNameAndEmail(
                       desc: "İsim Soyisim",
                       text: streamSnapshot.data!['name']+" "+streamSnapshot.data!['surname'],
-                      icon: Icons.create_outlined, onPress: (){},
+                      icon: Icons.create_outlined, onPress: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => NameChangePage(userid2: userid,)));
+                    },
                     ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-
-                  Container(
-                    child: buildShowUserNameAndEmail(
-                      desc: "Email",
-                      text: streamSnapshot.data!['email'],
-                      icon: Icons.create_outlined, onPress: (){},
-                    ),
-                  ),
-                  SizedBox(height:MediaQuery.of(context).size.height* 0.03),
 
                   Container(
                     child: buildShowUserNameAndEmail(
                       desc: "Telefon Numarası",
                       text: streamSnapshot.data!['number'],
-                      icon: Icons.create_outlined, onPress: (){},
+                      icon: Icons.create_outlined, onPress: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => NumberChangePage(userid2: userid,)));
+                    },
                     ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.03),
 
+                  Container(
+                    child: buildShowUserNameAndEmailWithoutIcon(
+                      desc: "Email",
+                      text: streamSnapshot.data!['email'],
+                    ),
+                  ),
+                  SizedBox(height:MediaQuery.of(context).size.height* 0.03),
+
+                  ElevatedButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context) => NumberChangePage(userid2: userid,)));}, child: Text("Test")),
                 ],
               ),
             );
@@ -154,7 +159,7 @@ Widget buildShowUserNameAndEmail(
             ),
 
             InkWell(
-              onTap: (){},
+              onTap: (){onPress();},
               child: Icon(
                 icon,
                 size: 18,
@@ -166,4 +171,224 @@ Widget buildShowUserNameAndEmail(
       ],
     ),
   );
+}
+
+Widget buildShowUserNameAndEmailWithoutIcon(
+    {required String desc,required String text,}) {
+  return Container(
+    width: double.infinity,
+    padding: EdgeInsets.all(20),
+    decoration: BoxDecoration(
+      color: Colors.blue.shade400,
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Text(
+            desc,
+            style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w400,fontSize: 14),),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              text,
+              style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500,fontSize: 15),
+            ),
+
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+class NameChangePage extends StatelessWidget {
+  NameChangePage({Key? key,this.userid2}) : super(key: key);
+  final userid2;
+  final TextEditingController textEditingControllername = TextEditingController();
+  final TextEditingController textEditingControllersurname = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    String? userid = userid2;
+
+
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      appBar: AppBar(title:Text("İsim Soyisim Değiştirme"),),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+
+                SizedBox(height: MediaQuery.of(context).size.height * 0.08),
+
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade400,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Text(
+                          "Yeni isim:",
+                          style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w400,fontSize: 14),),
+                      ),
+                      TextField(
+                        keyboardType: TextInputType.text,
+                        style: TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: "Yeni isim giriniz."
+                        ),
+                        controller: textEditingControllername,
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade400,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Text(
+                          "Yeni soyisim:",
+                          style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w400,fontSize: 14),),
+                      ),
+                      TextField(
+                        style: TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                            hintText: "Yeni soyisim giriniz."
+                        ),
+                        controller: textEditingControllersurname,
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+
+                ElevatedButton(onPressed: (){
+                  try{
+                    FirebaseFirestore.instance
+                        .collection('Users')
+                        .doc(userid)
+                        .update({'name':textEditingControllername.text,'surname':textEditingControllersurname.text,}).whenComplete((){
+                      Fluttertoast.showToast(msg: "Güncelleme Başarılı");
+                      Navigator.pop(context);
+                        });
+                  }on FirebaseAuthException catch(error){
+                    String? error_message=error.message;
+                    Fluttertoast.showToast(msg: "Error : $error_message");
+                  }
+                }, child: Text("Kaydet")),
+
+              ],
+            ),
+          )
+        ),
+      ),
+    );
+  }
+}
+
+class NumberChangePage extends StatelessWidget {
+  NumberChangePage({Key? key, this.userid2}) : super(key: key);
+  final String? userid2;
+  final TextEditingController textEditingControllernumber = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    String? userid = userid2;
+
+
+    return Scaffold(
+      appBar: AppBar(title:Text("Numara Değiştirme"),),
+      body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+
+                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade400,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Text(
+                          "Yeni numara:",
+                          style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w400,fontSize: 14),),
+                      ),
+                      TextField(
+                        maxLength: 11,
+                        keyboardType: TextInputType.number,
+                        style: TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                            hintText: "05338889944 şeklinde",
+                        ),
+                        controller: textEditingControllernumber,
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+
+                ElevatedButton(onPressed: (){
+                  try{
+                    FirebaseFirestore.instance
+                        .collection('Users')
+                        .doc(userid)
+                        .update({'number':textEditingControllernumber.text,}).whenComplete((){
+                      Fluttertoast.showToast(msg: "Güncelleme Başarılı");
+                      Navigator.pop(context);}
+                    );
+                  }on FirebaseAuthException catch(error){
+                    String? error_message=error.message;
+                    Fluttertoast.showToast(msg: "Error : $error_message");
+                  }
+
+                }, child: Text("Kaydet")),
+
+              ],
+            ),
+          )
+      ),
+    );
+  }
 }

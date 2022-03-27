@@ -134,7 +134,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ),
                                 cursorColor: Colors.white,
                                 keyboardType: TextInputType.number,
+                                maxLength: 11,
                                 decoration: InputDecoration(
+                                  counterText: '',
                                   prefixIcon: Icon(
                                     Icons.person,
                                     color: Colors.white,
