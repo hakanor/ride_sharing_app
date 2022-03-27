@@ -11,7 +11,7 @@ class ForgotPassword extends StatefulWidget {
 }
 
 class _ForgotPasswordState extends State<ForgotPassword> {
-
+  final GlobalKey<FormState> _key = GlobalKey<FormState>();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future sifreSifirla(String email) async{
@@ -25,65 +25,72 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     return Scaffold(
         body: Stack(
           children: [
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Container(
-                  height: size.height * .3,
-                  width: size.width * .85,
-                  decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(.75),
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey.withOpacity(.75),
-                            blurRadius: 10,
-                            spreadRadius: 2)
-                      ]),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+            Form(
+              key: _key,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Container(
+                    height: size.height * .3,
+                    width: size.width * .85,
+                    decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(.75),
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.grey.withOpacity(.75),
+                              blurRadius: 10,
+                              spreadRadius: 2)
+                        ]),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
 
-                          SizedBox(
-                            height: size.height * 0.02,
-                          ),
-                          TextField(
-                              controller: _emailController,
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                              cursorColor: Colors.white,
-                              keyboardType: TextInputType.emailAddress,
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(
-                                  Icons.mail,
+                            SizedBox(
+                              height: size.height * 0.02,
+                            ),
+                            TextFormField(
+                                controller: _emailController,
+                                style: TextStyle(
                                   color: Colors.white,
                                 ),
-                                hintText: 'E-Mail',
-                                prefixText: ' ',
-                                hintStyle: TextStyle(color: Colors.white),
-                                focusColor: Colors.white,
-                                focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Colors.white,
-                                    )),
-                                enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Colors.white,
-                                    )),
-                              )),
+                                validator: (value){
+                                  if (value == null || value.isEmpty) return 'Alan boş bırakılamaz.';
+                                  return null;
+                                },
+                                cursorColor: Colors.white,
+                                keyboardType: TextInputType.emailAddress,
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(
+                                    Icons.mail,
+                                    color: Colors.white,
+                                  ),
+                                  hintText: 'E-Mail',
+                                  prefixText: ' ',
+                                  hintStyle: TextStyle(color: Colors.white),
+                                  focusColor: Colors.white,
+                                  focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.white,
+                                      )),
+                                  enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.white,
+                                      )),
+                                )),
 
-                          SizedBox(
-                            height: size.height * 0.04,
-                          ),
-                          InkWell(
-                            onTap: () {
-
+                            SizedBox(
+                              height: size.height * 0.04,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                if (_key.currentState!.validate()) {
+                                  _key.currentState!.save();
                                   try{
-                                   sifreSifirla(_emailController.text.trim())
+                                    sifreSifirla(_emailController.text.trim())
                                         .then((value) {
                                       Fluttertoast.showToast(msg: "Şifre sıfırlama e-postası gönderildi.");
                                       return Navigator.pop(context);
@@ -92,28 +99,31 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                     String? error_message=error.message;
                                     Fluttertoast.showToast(msg: "Error : $error_message");
                                   }
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 5),
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.white, width: 2),
-                                  color: Colors.white,
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(30))),
-                              child: Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Center(
-                                    child: Text(
-                                      "Şifremi Sıfırla",
-                                      style: TextStyle(
-                                        color: Colors.blue,
-                                        fontSize: 20,
-                                      ),
-                                    )),
+                                }
+                                
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 5),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.white, width: 2),
+                                    color: Colors.white,
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(30))),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Center(
+                                      child: Text(
+                                        "Şifremi Sıfırla",
+                                        style: TextStyle(
+                                          color: Colors.blue,
+                                          fontSize: 20,
+                                        ),
+                                      )),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
