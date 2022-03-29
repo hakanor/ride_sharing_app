@@ -66,13 +66,7 @@ class _ProfilePageState  extends State<ProfilePage> {
                             width: ((size.width)-40)/3,
                             child: Align(
                               alignment: Alignment.topLeft,
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: Icon(
-                                  Icons.arrow_back_ios_outlined,
-                                  color: Colors.blue.withOpacity(.75),
-                                  size: 26,
-                                ),
+                              child: SizedBox(
                               ),
                             ),
                           ),
