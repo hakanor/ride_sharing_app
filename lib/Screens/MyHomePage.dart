@@ -2,8 +2,7 @@ import 'package:ride_sharing_app/Screens/PersonalAdsPage.dart';
 import 'package:flutter/material.dart';
 import '../Services/auth_service.dart';
 import 'HomePage.dart';
-import 'Login Screens/LoginPage.dart';
-import 'ProfilePage.dart';
+import 'Profile Screens/ProfilePage.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -33,7 +32,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Araç Paylaşım Uygulaması"),
+      /*appBar: AppBar(title: Text("Araç Paylaşım Uygulaması"),
         actions: [
           IconButton(
             onPressed: (){
@@ -44,9 +43,11 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.logout),
           )
         ],
-      ),
+      ),*/
 
-      body:_children[_currentIndex],
+      body:SafeArea(
+        child: _children[_currentIndex],
+      ),
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,

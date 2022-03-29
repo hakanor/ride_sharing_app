@@ -8,7 +8,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:firebase_storage/firebase_storage.dart' as storage;
+import 'package:ride_sharing_app/Screens/Profile%20Screens/PasswordChangePage.dart';
 import 'dart:io';
+
+import '../Login Screens/LoginPage.dart';
+
+enum _MenuValues {
+  settings,
+  logout,
+}
 
 class ProfilePage extends StatefulWidget {
 
@@ -27,9 +35,9 @@ class _ProfilePageState  extends State<ProfilePage> {
   String? userid= FirebaseAuth.instance.currentUser?.uid;
   String imageUrl='';
 
-  @override
+@override
   Widget build(BuildContext context) {
-
+    var size = MediaQuery.of(context).size;
     return Scaffold(
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -45,93 +53,170 @@ class _ProfilePageState  extends State<ProfilePage> {
             }
 
             return SingleChildScrollView(
-              child: Column(
+              child: Stack(
                 children: [
-                  SizedBox(height: MediaQuery.of(context).size.height* 0.04),
-                  Center(
-                    //TODO Display user profile image
-                    child: Stack(
-                      children: [
-                        Container(
-                          height: MediaQuery.of(context).size.height * 0.18,
-                          width: MediaQuery.of(context).size.height* 0.18,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.blue,width: 4),
-                            borderRadius: BorderRadius.circular(100),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.grey.withOpacity(.55),
-                                    blurRadius: 10,
-                                    spreadRadius: 2)
-                              ],
-                          ),
-
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(100),
-                            child: streamSnapshot.data!['Image'] != 'Image goes here' ? Image.network(
-                              streamSnapshot.data!['Image'],
-                              fit: BoxFit.cover,
-                            )
-                                : Center(
-                              child:Image.asset('assets/play_store_512.png'),
-                            ),
-                          ),
-                        ),
-
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: InkWell(
-                            onTap: (){
-                              selectPhoto();
-                            },
-                            child: Container(
-                              width:30,
-                              height: 30,
-                              child: Icon(Icons.camera_alt_outlined,color: Colors.black87,),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Colors.blue,
+                  Padding(
+                    padding:
+                    EdgeInsets.only(top: size.height * .03),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: ((size.width)-40)/3,
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: IconButton(
+                                onPressed: () {},
+                                icon: Icon(
+                                  Icons.arrow_back_ios_outlined,
+                                  color: Colors.blue.withOpacity(.75),
+                                  size: 26,
+                                ),
                               ),
                             ),
                           ),
+                          Container(
+                            width: ((size.width)-40)/3,
+                            child: Center(
+                              child: Text(
+                                "Profilim",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.blue.withOpacity(.75),
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: ((size.width)-40)/3,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: PopupMenuButton<_MenuValues>(
+                                icon: Icon(Icons.settings_outlined,color: Colors.blue,),
+                                itemBuilder: (BuildContext context) => [
+                                  PopupMenuItem(
+                                    child: Text('Şifremi değiştir'),
+                                    value: _MenuValues.settings,
+                                  ),
+                                  PopupMenuItem(
+                                    child: Text("Çıkış Yap"),
+                                    value: _MenuValues.logout,
+                                  ),
+                                ],
+                                onSelected: (value) {
+                                  switch (value) {
+                                    case _MenuValues.settings:
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => PasswordChangePage()));
+                                      break;
+                                    case _MenuValues.logout:
+                                      FirebaseAuth.instance.signOut();
+                                      Navigator.pushReplacement(context, MaterialPageRoute(
+                                          builder: (context) => LoginPage()));
+                                      break;
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+
+                        ],
+                      ),
+                    ),
+                  ),
+
+
+                  Center(
+                    child: Column(
+                      children: [
+                        SizedBox(height: MediaQuery.of(context).size.height* 0.12),
+                        Center(
+                          //TODO Display user profile image
+                            child: Stack(
+                              children: [
+                                Container(
+                                  height: MediaQuery.of(context).size.height * 0.18,
+                                  width: MediaQuery.of(context).size.height* 0.18,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.blue,width: 4),
+                                    borderRadius: BorderRadius.circular(100),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.grey.withOpacity(.55),
+                                          blurRadius: 10,
+                                          spreadRadius: 2)
+                                    ],
+                                  ),
+
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(100),
+                                    child: streamSnapshot.data!['Image'] != 'Image goes here' ? Image.network(
+                                      streamSnapshot.data!['Image'],
+                                      fit: BoxFit.cover,
+                                    )
+                                        : Center(
+                                      child:Image.asset('assets/play_store_512.png'),
+                                    ),
+                                  ),
+                                ),
+
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: InkWell(
+                                    onTap: (){
+                                      selectPhoto();
+                                    },
+                                    child: Container(
+                                      width:30,
+                                      height: 30,
+                                      child: Icon(Icons.camera_alt_outlined,color: Colors.black87,),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.blue,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
                         ),
+                        SizedBox(height:MediaQuery.of(context).size.height* 0.03),
+
+                        Container(
+                          child: buildShowUserNameAndEmail(
+                            desc: "İsim Soyisim",
+                            text: streamSnapshot.data!['name']+" "+streamSnapshot.data!['surname'],
+                            icon: Icons.create_outlined, onPress: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => NameChangePage(userid2: userid,)));
+                          },
+                          ),
+                        ),
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+
+                        Container(
+                          child: buildShowUserNameAndEmail(
+                            desc: "Telefon Numarası",
+                            text: streamSnapshot.data!['number'],
+                            icon: Icons.create_outlined, onPress: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => NumberChangePage(userid2: userid,)));
+                          },
+                          ),
+                        ),
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+
+                        Container(
+                          child: buildShowUserNameAndEmailWithoutIcon(
+                            desc: "Email",
+                            text: streamSnapshot.data!['email'],
+                          ),
+                        ),
+                        SizedBox(height:MediaQuery.of(context).size.height* 0.03),
                       ],
-                    )
-                  ),
-                  SizedBox(height:MediaQuery.of(context).size.height* 0.03),
-
-                  Container(
-                    child: buildShowUserNameAndEmail(
-                      desc: "İsim Soyisim",
-                      text: streamSnapshot.data!['name']+" "+streamSnapshot.data!['surname'],
-                      icon: Icons.create_outlined, onPress: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => NameChangePage(userid2: userid,)));
-                    },
                     ),
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-
-                  Container(
-                    child: buildShowUserNameAndEmail(
-                      desc: "Telefon Numarası",
-                      text: streamSnapshot.data!['number'],
-                      icon: Icons.create_outlined, onPress: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => NumberChangePage(userid2: userid,)));
-                    },
-                    ),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-
-                  Container(
-                    child: buildShowUserNameAndEmailWithoutIcon(
-                      desc: "Email",
-                      text: streamSnapshot.data!['email'],
-                    ),
-                  ),
-                  SizedBox(height:MediaQuery.of(context).size.height* 0.03),
                 ],
-              ),
+              )
             );
           },
         ),

@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:ride_sharing_app/Screens/test_screen.dart';
 import 'package:ride_sharing_app/Services/auth_service.dart';
+import 'Login Screens/LoginPage.dart';
 
 // BU SAYFA İLANLARIN GENEL OLARAK LİSTELENDİĞİ SAYFA OLACAKTIR.
 
@@ -39,6 +39,14 @@ class _HomePageState extends State<HomePage> {
             child: Text("İlan ver"),
             onPressed: (){
               Navigator.push(context, MaterialPageRoute(builder: (context) => test_screen()));
+            },
+          ),
+          ElevatedButton(
+            child: Text("Çıkış yap"),
+            onPressed: (){
+              _authService.signOut();
+              Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (context) => LoginPage()));
             },
           ),
         ],
