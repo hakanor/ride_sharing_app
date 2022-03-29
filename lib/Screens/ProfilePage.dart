@@ -1,7 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
+import 'package:firebase_storage/firebase_storage.dart' as storage;
+import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
 
@@ -18,6 +25,7 @@ class _ProfilePageState  extends State<ProfilePage> {
   CollectionReference usersCollection =
   FirebaseFirestore.instance.collection('Users');
   String? userid= FirebaseAuth.instance.currentUser?.uid;
+  String imageUrl='';
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +57,17 @@ class _ProfilePageState  extends State<ProfilePage> {
                           width: MediaQuery.of(context).size.height* 0.18,
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.blue,width: 4),
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(100),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.grey.withOpacity(.55),
+                                    blurRadius: 10,
+                                    spreadRadius: 2)
+                              ],
                           ),
 
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(25),
+                            borderRadius: BorderRadius.circular(100),
                             child: streamSnapshot.data!['Image'] != 'Image goes here' ? Image.network(
                               streamSnapshot.data!['Image'],
                               fit: BoxFit.cover,
@@ -69,13 +83,12 @@ class _ProfilePageState  extends State<ProfilePage> {
                           right: 0,
                           child: InkWell(
                             onTap: (){
-                              // ON TAP CAMERA BUTTON
-                              print("test");
+                              selectPhoto();
                             },
                             child: Container(
                               width:30,
                               height: 30,
-                              child: Icon(Icons.camera_alt_outlined),
+                              child: Icon(Icons.camera_alt_outlined,color: Colors.black87,),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
                                 color: Colors.blue,
@@ -125,6 +138,79 @@ class _ProfilePageState  extends State<ProfilePage> {
       ),
     );
   }
+
+  // PROFILE PICTURE PICK / CROP / COMPRESS / UPLOAD & CHANGE FUNCTIONS //
+  final ImagePicker _picker=ImagePicker();
+
+  Future selectPhoto() async{
+    await showModalBottomSheet(context: context, builder: (context)=> BottomSheet(
+      builder: (context)=>  Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(leading: Icon(Icons.camera),title: Text("Kamera"), onTap:(){
+            Navigator.of(context).pop();
+            pickImage(ImageSource.camera);
+          }),
+          ListTile(leading: Icon(Icons.photo),title: Text("Galeriden Seç"), onTap:(){
+            Navigator.of(context).pop();
+            pickImage(ImageSource.gallery);
+          }),
+        ],
+      ),
+      onClosing: (){},
+
+    ));
+  }
+
+  Future pickImage(ImageSource source) async{
+    final pickedFile = await _picker.pickImage(source: source,imageQuality: 50);
+    if(pickedFile==null){
+      return;
+    }
+    var file = await ImageCropper().cropImage(sourcePath: pickedFile.path,aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1));
+    if(file==null){
+      return;
+    }
+    file = await compressImage(file.path,35);
+
+    await uploadFile(file.path);
+
+  }
+  Future <File> compressImage(String path,int quality) async {
+    final newPath = p.join((await getTemporaryDirectory()).path,'${DateTime.now()}.${p.extension(path)}');
+
+    final result = await FlutterImageCompress.compressAndGetFile(
+      path,
+      newPath,
+      quality: quality,
+    );
+    return result!;
+  }
+
+  Future uploadFile(String path) async{
+    final ref = storage.FirebaseStorage.instance.ref()
+        .child('images')
+        .child('$userid');
+
+    final result = await ref.putFile(File(path));
+    final fileUrl= await result.ref.getDownloadURL();
+
+    setState(() {
+      imageUrl=fileUrl;
+      print(imageUrl);
+    });
+    changePhoto(imageUrl);
+  }
+
+  Future changePhoto(String imageUrl) async{
+    setState(() {
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userid)
+          .update({'Image':imageUrl,});
+    });
+  }
+
 }
 
 Widget buildShowUserNameAndEmail(
