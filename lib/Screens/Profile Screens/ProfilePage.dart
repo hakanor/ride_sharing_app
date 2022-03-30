@@ -381,7 +381,6 @@ class NameChangePage extends StatelessWidget {
   Widget build(BuildContext context) {
     String? userid = userid2;
 
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(title:Text("İsim Soyisim Değiştirme"),),
