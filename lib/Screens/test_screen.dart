@@ -14,10 +14,8 @@ class test_screen extends StatefulWidget {
 }
 
 class _test_screenState extends State<test_screen> {
-
-  // !! API KEY SAKLANACAK UNUTMA
   String? googleApikey=dotenv.env['GOOGLE_API_KEY'];
-  GoogleMapController? mapController; //contrller for Google map
+  GoogleMapController? mapController; //controller for Google map
   CameraPosition? cameraPosition;
   LatLng startLocation = LatLng(37.87121931889777, 32.505299407385266); // init map location (konya mevlana müzesi)
 
@@ -27,27 +25,25 @@ class _test_screenState extends State<test_screen> {
   var placeid1; // placeid for textfield1
   var placeid2; // placeid for textfield2
 
+  String start_location="";
+  String end_location="";
 
 
   // ------------------- marker işlemleri ------------------------------------//
   Set<Marker> markers = Set<Marker>(); // Marker list
 
-  // default location marker
-  @override
-  void initState() {
-    setMarker(LatLng(37.87121931889777, 32.505299407385266));
-    super.initState();
-  }
-
   // setmarker
   void setMarker(LatLng point){
     setState(() {
-      markers.add(Marker(markerId: MarkerId('marker'),position:point,));
+      markers.add(
+          Marker(
+            markerId: MarkerId('marker'),
+            position:point,
+          )
+      );
     });
   }
-
   // ------------------- ---------------- ------------------------------------//
-
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +225,20 @@ class _test_screenState extends State<test_screen> {
                   child: ElevatedButton(
                       child: Text("Yolculuk Bilgilerini Gir"),
                       onPressed: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage()));
+                        /* TEST İÇİN
+                        if(placeid1==null && placeid2==null){
+                          Fluttertoast.showToast(msg: "Başlangıç ve Bitiş noktası belirtilmek zorunda!");
+                        }
+                        else if(placeid1==null){Fluttertoast.showToast(msg: "Başlangıç noktası belirtilmek zorunda!");}
+                        else if(placeid2==null){Fluttertoast.showToast(msg: "Bitiş noktası belirtilmek zorunda!");}
+                        else{
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage()));
+                        }*/
+
+                        Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                            DetailPage(
+                              start_location:location , end_location: location2,
+                            )));
                       },
                   )
               ),

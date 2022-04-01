@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DetailPage extends StatefulWidget {
-  const DetailPage({Key? key}) : super(key: key);
+
+  String start_location,end_location;
+
+  DetailPage({required this.start_location,required this.end_location});
 
   @override
   _DetailPageState createState() => _DetailPageState();
@@ -16,10 +19,11 @@ class _DetailPageState extends State<DetailPage> {
     super.initState();
   }
 
-  DateTime? _dateTime;
-  TextEditingController _dateinput = new TextEditingController();
   TextEditingController _timeinput = new TextEditingController();
-  TextEditingController _count = new TextEditingController();
+  TextEditingController _dateinput = new TextEditingController();
+  TextEditingController _seatcount = new TextEditingController();
+  TextEditingController _carbrand = new TextEditingController();
+  TextEditingController _carmodel = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +38,7 @@ class _DetailPageState extends State<DetailPage> {
               SizedBox(
                 height: 20,
               ),
+
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
@@ -43,23 +48,54 @@ class _DetailPageState extends State<DetailPage> {
                     controller: _timeinput,
                     readOnly: true,
                     decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: (){
+                          setState(() {
+                            _timeinput.text="";
+                          });
+                        },
+                      ),
                       labelText: "Çıkış Saati Seçin",
                       labelStyle: TextStyle(fontSize: 16),
                       border: OutlineInputBorder(),
                     ),
                     onTap: () async {
-                      TimeOfDay? pickedTime=await showTimePicker(context: context, initialTime: TimeOfDay.now());
+                      TimeOfDay? pickedTime=await showTimePicker(
+                        helpText: "Çıkış saati Seçin",
+                          cancelText: "İptal",
+                          confirmText: "Onayla",
+                          hourLabelText: "Saat",
+                          minuteLabelText: "Dakika",
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                          initialEntryMode: TimePickerEntryMode.dial,
+                          builder: (context,child){
+                            return MediaQuery(
+                                data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                                child: child ?? Container(),)
+                          }
+                      );
+
                       if(pickedTime != null ){
-                        print(pickedTime.format(context));
-                        DateTime parsedTime = DateFormat.jm().parse(pickedTime.format(context).toString());
-                        print(parsedTime); //output 1970-01-01 22:53:00.000
-                        String formattedTime = DateFormat('HH:mm').format(parsedTime);
-                        print(formattedTime); //output 14:59:00
+
+                        String _hour = pickedTime.hour.toString();
+                        String _minute = pickedTime.minute.toString();
+                        if(pickedTime.hour<10){
+                          _hour="0"+_hour;
+                        }
+                        if(pickedTime.minute<10){
+                          _minute="0"+_minute;
+                        }
+
+                        String formattedTime = _hour + ' : ' + _minute;
+                        print(formattedTime);
+
                         setState(() {
                           _timeinput.text=formattedTime;
                         });
                       }else{
-                        print("Time is not selected");
+                        print("Saat Seçilmedi");
                       }
                     },
                   ),
@@ -75,12 +111,24 @@ class _DetailPageState extends State<DetailPage> {
                     controller: _dateinput,
                     readOnly: true,
                     decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: (){
+                          setState(() {
+                            _dateinput.text="";
+                          });
+                        },
+                      ),
                       labelText: "Çıkış Tarihi Seçin",
                       labelStyle: TextStyle(fontSize: 16),
                       border: OutlineInputBorder(),
                     ),
                     onTap: () async {
                       DateTime? pickedDate=await showDatePicker(
+                          locale: const Locale("tr", "TR"),
+                          helpText: "Yolculuk için tarih seçiniz.",
+                          cancelText: "İptal",
+                          confirmText: "Onayla",
                           context: context,
                           initialDate: DateTime.now(),
                           firstDate: DateTime(2000),
@@ -88,13 +136,13 @@ class _DetailPageState extends State<DetailPage> {
                       );
                       if(pickedDate != null ){
                         print(pickedDate);
-                        String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
+                        String formattedDate = DateFormat('dd.MM.yyyy').format(pickedDate);
                         print(formattedDate);
                         setState(() {
                           _dateinput.text=formattedDate;
                         });
                       }else{
-                        print("Date is not selected");
+                        print("Tarih Seçilmedi");
                       }
                     },
                   ),
@@ -107,7 +155,8 @@ class _DetailPageState extends State<DetailPage> {
                 child: Container(
                   height: 40,
                   width: 350,
-                  child: TextField(
+                  child: TextFormField(
+                    controller: _seatcount,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       labelText: "Kaç Kişilik yeriniz var?",
@@ -123,7 +172,8 @@ class _DetailPageState extends State<DetailPage> {
                 child: Container(
                   height: 40,
                   width: 350,
-                  child: TextField(
+                  child: TextFormField(
+                    controller:_carbrand,
                     decoration: InputDecoration(
                       labelText: "Araç Markası Girin",
                       labelStyle: TextStyle(fontSize: 16),
@@ -138,7 +188,8 @@ class _DetailPageState extends State<DetailPage> {
                 child: Container(
                   height: 40,
                   width: 350,
-                  child: TextField(
+                  child: TextFormField(
+                    controller: _carmodel,
                     decoration: InputDecoration(
                       labelText: "Araç Modeli Girin",
                       labelStyle: TextStyle(fontSize: 16),
@@ -151,7 +202,7 @@ class _DetailPageState extends State<DetailPage> {
               Align(
                 alignment: Alignment.bottomRight,
                 child: Padding(
-                  padding: const EdgeInsets.only(right: 22),
+                  padding: const EdgeInsets.only(right: 8),
                   child: ElevatedButton(
                     child: Text("İlan Ver"),
                     onPressed: (){
@@ -159,9 +210,23 @@ class _DetailPageState extends State<DetailPage> {
                     },
                   ),
                 ),
-              )
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ElevatedButton(
+                    child: Text("Test Ver"),
+                    onPressed: (){
 
+                    },
+                  ),
+                ),
+              ),
 
+              ElevatedButton(onPressed: (){
+                print(widget.start_location);
+              }, child: Text("selam"))
             ],
 
           ),
