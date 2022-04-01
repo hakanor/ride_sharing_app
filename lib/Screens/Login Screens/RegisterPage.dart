@@ -10,7 +10,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-
+  late bool _passwordVisible;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
@@ -21,6 +21,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  void initState() {
+    _passwordVisible = false;
+    super.initState();
+  }
 
   Future<User?> createPerson(String name,String surname,String number, String email, String password) async {
     try{
@@ -192,7 +197,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ),
                                   cursorColor: Colors.white,
                                   controller: _passwordController,
-                                  obscureText: true,
+                                  obscureText: !_passwordVisible,
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(
                                       Icons.vpn_key,
@@ -200,6 +205,17 @@ class _RegisterPageState extends State<RegisterPage> {
                                     ),
                                     hintText: 'Parola',
                                     prefixText: ' ',
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _passwordVisible
+                                            ? Icons.visibility : Icons.visibility_off,color: Theme.of(context).primaryColorDark,
+                                      ),
+                                      onPressed: (){
+                                        setState(() {
+                                          _passwordVisible=!_passwordVisible;
+                                        });
+                                      },
+                                    ),
                                     hintStyle: TextStyle(color: Colors.white),
                                     focusColor: Colors.white,
                                     focusedBorder: UnderlineInputBorder(
@@ -220,7 +236,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ),
                                   cursorColor: Colors.white,
                                   controller: _passwordAgainController,
-                                  obscureText: true,
+                                  obscureText: !_passwordVisible,
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(
                                       Icons.vpn_key,
@@ -228,6 +244,17 @@ class _RegisterPageState extends State<RegisterPage> {
                                     ),
                                     hintText: 'Parola Tekrar',
                                     prefixText: ' ',
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _passwordVisible
+                                            ? Icons.visibility : Icons.visibility_off,color: Theme.of(context).primaryColorDark,
+                                      ),
+                                      onPressed: (){
+                                        setState(() {
+                                          _passwordVisible=!_passwordVisible;
+                                        });
+                                      },
+                                    ),
                                     hintStyle: TextStyle(color: Colors.white),
                                     focusColor: Colors.white,
                                     focusedBorder: UnderlineInputBorder(

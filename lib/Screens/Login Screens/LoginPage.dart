@@ -12,8 +12,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late bool _passwordVisible;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  void initState() {
+    _passwordVisible = false;
+    super.initState();
+  }
 
   AuthService _authService = AuthService();
 
@@ -117,11 +123,22 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 cursorColor: Colors.white,
                                 controller: _passwordController,
-                                obscureText: true,
+                                obscureText: !_passwordVisible,
                                 decoration: InputDecoration(
                                   prefixIcon: Icon(
                                     Icons.vpn_key,
                                     color: Colors.white,
+                                  ),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _passwordVisible
+                                          ? Icons.visibility : Icons.visibility_off,color: Theme.of(context).primaryColorDark,
+                                    ),
+                                    onPressed: (){
+                                      setState(() {
+                                        _passwordVisible=!_passwordVisible;
+                                      });
+                                    },
                                   ),
                                   hintText: 'Parola',
                                   prefixText: ' ',

@@ -12,10 +12,13 @@ class PasswordChangePage extends StatefulWidget {
 }
 
 class _PasswordChangePageState extends State<PasswordChangePage> {
-
+  late bool _passwordVisible;
+  late bool _passwordVisible2;
   @override
   void initState() {
     // TODO: implement initState
+    _passwordVisible = false;
+    _passwordVisible2= false;
     getPassword();
     super.initState();
   }
@@ -148,11 +151,23 @@ class _PasswordChangePageState extends State<PasswordChangePage> {
                                   style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w400,fontSize: 14),),
                               ),
                               TextFormField(
+                                obscureText: !_passwordVisible,
                                 keyboardType: TextInputType.text,
                                 style: TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
                                     hintText: "Eski şifrenizi girin",
                                   hintStyle: TextStyle(color: Colors.black45),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                        _passwordVisible
+                                        ? Icons.visibility : Icons.visibility_off,color: Theme.of(context).primaryColorDark,
+                                    ),
+                                    onPressed: (){
+                                      setState(() {
+                                        _passwordVisible=!_passwordVisible;
+                                      });
+                                    },
+                                  ),
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) return 'Alan boş bırakılamaz.';
@@ -184,10 +199,22 @@ class _PasswordChangePageState extends State<PasswordChangePage> {
                                   style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w400,fontSize: 14),),
                               ),
                               TextFormField(
+                                obscureText: !_passwordVisible2,
                                 style: TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
                                     hintText: "Yeni şifrenizi girin",
                                   hintStyle: TextStyle(color: Colors.black45),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _passwordVisible2
+                                          ? Icons.visibility : Icons.visibility_off,color: Theme.of(context).primaryColorDark,
+                                    ),
+                                    onPressed: (){
+                                      setState(() {
+                                        _passwordVisible2=!_passwordVisible2;
+                                      });
+                                    },
+                                  ),
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) return 'Alan boş bırakılamaz.';
