@@ -15,29 +15,35 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: _usersStream,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return Text('Error');
-        }
+    return Scaffold(
+      appBar: AppBar(title: Text("tüm ilanlar"),),
+      body:StreamBuilder<QuerySnapshot>(
+        stream: _usersStream,
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Text('Error');
+          }
 
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Text("Yükleniyor");
-        }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Text("Yükleniyor");
+          }
 
-        return ListView(
-          children: snapshot.data!.docs.map((DocumentSnapshot document) {
-            Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-            String str1= data['start_location']+" ->  "+data['end_location'];
-            String str2= "Saat : "+ data['time']+" Tarih: "+data['date'];
-            return ListTile(
-              title: Text(str1),
-              subtitle: Text(str2),
-            );
-          }).toList(),
-        );
-      },
+          return ListView(
+            children: snapshot.data!.docs.map((DocumentSnapshot document) {
+              Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+              String str1= data['start_location']+" ->  "+data['end_location'];
+              String str2= "Saat : "+ data['time']+" Tarih: "+data['date'];
+              return ListTile(
+                title: Text(str1),
+                subtitle: Text(str2),
+                onTap: (){
+                  print(str1);
+                },
+              );
+            }).toList(),
+          );
+        },
+      ),
     );
   }
 }
