@@ -4,7 +4,7 @@ import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
-import 'package:ride_sharing_app/Screens/test_detail.dart';
+import 'package:ride_sharing_app/Screens/Listing%20Screens/test_detail.dart';
 
 class test_screen extends StatefulWidget {
   const test_screen({Key? key}) : super(key: key);

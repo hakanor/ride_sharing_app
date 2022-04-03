@@ -1,7 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:ride_sharing_app/Screens/test_screen.dart';
-import 'package:ride_sharing_app/Services/auth_service.dart';
-import 'Login Screens/LoginPage.dart';
 
 // BU SAYFA İLANLARIN GENEL OLARAK LİSTELENDİĞİ SAYFA OLACAKTIR.
 
@@ -13,48 +11,33 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
-
-  AuthService _authService = AuthService();
+  final Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance.collection('Listings').snapshots();
 
   @override
   Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _usersStream,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error');
+        }
 
-    String userId= _authService.UserIdbul();
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Text("Yükleniyor");
+        }
 
-    return Container(
-      child: (
-      Column(
-        children: [
-          Text("User id : $userId"),
-          ElevatedButton(
-            child: Text("userid bul"),
-            onPressed: (){
-                setState(() {
-                  _authService.UserIdbul();
-                });
-              },
-          ),
-          ElevatedButton(
-            child: Text("İlan ver"),
-            onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => test_screen()));
-            },
-          ),
-          ElevatedButton(
-            child: Text("Çıkış yap"),
-            onPressed: (){
-              _authService.signOut();
-              Navigator.pushReplacement(context, MaterialPageRoute(
-                  builder: (context) => LoginPage()));
-            },
-          ),
-
-
-        ],
-      )
-
-      ),
+        return ListView(
+          children: snapshot.data!.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+            String str1= data['start_location']+" ->  "+data['end_location'];
+            String str2= "Saat : "+ data['time']+" Tarih: "+data['date'];
+            return ListTile(
+              title: Text(str1),
+              subtitle: Text(str2),
+            );
+          }).toList(),
+        );
+      },
     );
   }
 }

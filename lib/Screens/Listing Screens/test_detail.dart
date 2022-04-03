@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
 class DetailPage extends StatefulWidget {
@@ -24,6 +27,36 @@ class _DetailPageState extends State<DetailPage> {
   TextEditingController _seatcount = new TextEditingController();
   TextEditingController _carbrand = new TextEditingController();
   TextEditingController _carmodel = new TextEditingController();
+  TextEditingController _platenumber = new TextEditingController();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+
+  Future createListing(String start_location,String end_location,String date, String time, int seat_count,String car_brand,String car_model,String platenumber) async {
+    try{
+      var currentUser = _auth.currentUser;
+      await _firestore
+          .collection("Listings")
+          .doc()
+          .set({
+        'start_location': start_location,
+        'end_location': end_location,
+        'date': date,
+        'time': time,
+        'seat_count':seat_count,
+        "car_brand":car_brand,
+        "car_model":car_model,
+        "user_id":currentUser?.uid,
+        "platenumber":platenumber,
+      });
+
+    } on FirebaseAuthException catch(error){
+      String? error_message=error.message;
+      Fluttertoast.showToast(msg: "Error : $error_message");
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -199,6 +232,22 @@ class _DetailPageState extends State<DetailPage> {
                 ),
               ),
 
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 40,
+                  width: 350,
+                  child: TextFormField(
+                    controller: _platenumber,
+                    decoration: InputDecoration(
+                      labelText: "Araç Palakası Giriniz",
+                      labelStyle: TextStyle(fontSize: 16),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ),
+
               Align(
                 alignment: Alignment.bottomRight,
                 child: Padding(
@@ -206,27 +255,20 @@ class _DetailPageState extends State<DetailPage> {
                   child: ElevatedButton(
                     child: Text("İlan Ver"),
                     onPressed: (){
-
+                      createListing(
+                          widget.start_location,
+                          widget.end_location,
+                          _dateinput.text,
+                          _timeinput.text,
+                          int.parse(_seatcount.text),
+                          _carbrand.text,
+                          _carmodel.text,
+                          _platenumber.text,
+                      );
                     },
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ElevatedButton(
-                    child: Text("Test Ver"),
-                    onPressed: (){
-
-                    },
-                  ),
-                ),
-              ),
-
-              ElevatedButton(onPressed: (){
-                print(widget.start_location);
-              }, child: Text("selam"))
             ],
 
           ),
