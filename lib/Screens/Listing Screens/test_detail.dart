@@ -121,7 +121,7 @@ class _DetailPageState extends State<DetailPage> {
                           _minute="0"+_minute;
                         }
 
-                        String formattedTime = _hour + ' : ' + _minute;
+                        String formattedTime = _hour + ':' + _minute;
                         print(formattedTime);
 
                         setState(() {
