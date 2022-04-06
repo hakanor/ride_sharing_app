@@ -81,6 +81,7 @@ class _HomePageState extends State<HomePage> {
 
               ElevatedButton(onPressed: (){setState(() {
                 _usersStream = FirebaseFirestore.instance.collection('Listings').snapshots();
+                controller.text="";
               });}, child: Icon(Icons.clear)),
 
               Flexible(
