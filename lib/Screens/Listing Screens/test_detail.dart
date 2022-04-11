@@ -258,6 +258,7 @@ class _DetailPageState extends State<DetailPage> {
                           height: 40,
                           width: 125,
                           child: TextFormField(
+                            keyboardType: TextInputType.number,
                             controller: _price,
                             decoration: InputDecoration(
                               labelText: "Ücret Giriniz",
@@ -286,6 +287,7 @@ class _DetailPageState extends State<DetailPage> {
                       onPressed: (){
                             if (_timeinput.text==null || _dateinput.text==null || _seatcount.text==null
                                 || _carbrand.text==null || _carmodel.text==null || _platenumber.text==null
+                                || _timeinput.text=="" || _dateinput.text==""
                             ) {
                               Fluttertoast.showToast(msg: "Tüm alanların doldurulması gerekmektedir.");
                             }
