@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:ride_sharing_app/Screens/MyHomePage.dart';
 
 class DetailPage extends StatefulWidget {
 
@@ -56,13 +55,12 @@ class _DetailPageState extends State<DetailPage> {
       String? error_message=error.message;
       Fluttertoast.showToast(msg: "Error : $error_message");
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(title: Text("İlan Detaylarını Gir"),),
       body: SingleChildScrollView(
         child: Center(
@@ -184,7 +182,6 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                 ),
 
-
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
@@ -276,11 +273,9 @@ class _DetailPageState extends State<DetailPage> {
                         width: 150,
                         child: Center(child: Text("",style: TextStyle(color: Colors.black87),)),
                       ),
-
                     ],
                   )
                 ),
-
 
                 Align(
                   alignment: Alignment.bottomRight,
@@ -295,17 +290,22 @@ class _DetailPageState extends State<DetailPage> {
                               Fluttertoast.showToast(msg: "Tüm alanların doldurulması gerekmektedir.");
                             }
                             else{
-                              createListing(
-                                widget.start_location,
-                                widget.end_location,
-                                _dateinput.text,
-                                _timeinput.text,
-                                int.parse(_seatcount.text),
-                                _carbrand.text,
-                                _carmodel.text,
-                                _platenumber.text,
-                              );
-                              Navigator.popUntil(context, (route) =>route.isFirst);
+                              try{
+                                createListing(
+                                  widget.start_location,
+                                  widget.end_location,
+                                  _dateinput.text,
+                                  _timeinput.text,
+                                  int.parse(_seatcount.text),
+                                  _carbrand.text,
+                                  _carmodel.text,
+                                  _platenumber.text,
+                                );
+                                Navigator.popUntil(context, (route) =>route.isFirst);
+                                Fluttertoast.showToast(msg: "İlan başarıyla oluşturuldu.");
+                              } catch(error){
+                                Fluttertoast.showToast(msg: "Tüm alanların doldurulması gerekmektedir.");
+                              }
                             }
 
                       },

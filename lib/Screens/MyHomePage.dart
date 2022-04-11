@@ -32,18 +32,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /*appBar: AppBar(title: Text("Araç Paylaşım Uygulaması"),
-        actions: [
-          IconButton(
-            onPressed: (){
-              _authService.signOut();
-              Navigator.pushReplacement(context, MaterialPageRoute(
-                  builder: (context) => LoginPage()));
-            },
-            icon: Icon(Icons.logout),
-          )
-        ],
-      ),*/
 
       body:SafeArea(
         child: _children[_currentIndex],

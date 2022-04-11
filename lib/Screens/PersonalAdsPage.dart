@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ride_sharing_app/Screens/location_test.dart';
 import '../Services/auth_service.dart';
 import 'Listing Screens/test_screen.dart';
 import 'Login Screens/LoginPage.dart';
@@ -16,27 +17,42 @@ class _PersonalAdsState extends State<PersonalAdsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          ElevatedButton(
-            child: Text("İlan ver"),
-            onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => test_screen()));
-            },
-          ),
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+          onPressed: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context) => test_screen()));
+          },
+          child: Icon(Icons.add)
+      ),
+      body: Container(
+        child: Column(
+          children: [
+            ElevatedButton(
+              child: Text("İlan ver"),
+              onPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => test_screen()));
+              },
+            ),
 
-          ElevatedButton(
-            child: Text("Çıkış yap"),
-            onPressed: (){
-              _authService.signOut();
-              Navigator.pushReplacement(context, MaterialPageRoute(
-                  builder: (context) => LoginPage()));
-            },
-          ),
+            ElevatedButton(
+              child: Text("2 Konum arası uzaklık bul"),
+              onPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => LocationTest()));
+              },
+            ),
 
-        ],
+            ElevatedButton(
+              child: Text("Çıkış yap"),
+              onPressed: (){
+                _authService.signOut();
+                Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) => LoginPage()));
+              },
+            ),
 
+          ],
+
+        ),
       ),
     );
   }
