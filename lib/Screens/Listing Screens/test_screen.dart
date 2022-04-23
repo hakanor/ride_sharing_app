@@ -109,6 +109,9 @@ class _test_screenState extends State<test_screen> {
   }
 
   void setPolylines() async{
+     _polylines.clear();
+     polylineCoordinates.clear();
+
     PolylineResult result=await polylinePoints.getRouteBetweenCoordinates(
         googleApikey!,
         PointLatLng(place1.latitude, place1.longitude),
@@ -122,7 +125,7 @@ class _test_screenState extends State<test_screen> {
     setState(() {
       _polylines.add(
         Polyline(
-          width: 10,
+          width: 6,
           polylineId: PolylineId('polyLine'),
           color: Color(0xFF08A5CB),
           points: polylineCoordinates,
@@ -284,6 +287,7 @@ class _test_screenState extends State<test_screen> {
                           setState(() {
                             markers.add(finishMarker);
                             placeid2=placeid;
+                            setPolylines();
                           });
 
                           //move map camera to selected place with animation
