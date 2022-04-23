@@ -95,7 +95,6 @@ class _test_screenState extends State<test_screen> {
     super.initState();
   }
 
-
   // setmarker
   void setMarker(LatLng point){
     setState(() {

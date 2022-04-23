@@ -54,6 +54,8 @@ dependencies:
   flutter_localizations: # Add this line
     sdk: flutter         # Add this line
   dio: ^4.0.6
+  dotted_line: ^3.1.0
+  url_launcher: ^6.1.0
 
 dev_dependencies:
   flutter_test:
@@ -80,6 +82,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/play_store_512.png
+    - assets/play_store_513.png
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -33,9 +33,34 @@ class _DetailPageState extends State<DetailPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 
-  Future createListing(String start_location,String end_location,String date, String time, int seat_count,String car_brand,String car_model,String platenumber) async {
+  Future<String> yazigetir () async {
+    String name="";
+    String surname="";
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(_auth.currentUser?.uid)
+        .get().then((value) {
+      name=value.data()!['name'];
+      surname=value.data()!['surname'];
+      print(name);
+    });
+    return name+" "+surname;
+  }
+
+  Future createListing(
+      String start_location,
+      String end_location,
+      String date,
+      String time,
+      int seat_count,
+      String car_brand,
+      String car_model,
+      String platenumber,
+      String price,
+      ) async {
     try{
-      var currentUser = _auth.currentUser;
+      var currentUser = await _auth.currentUser;
+      String name_surname= await yazigetir();
       await _firestore
           .collection("Listings")
           .doc()
@@ -48,7 +73,9 @@ class _DetailPageState extends State<DetailPage> {
         "car_brand":car_brand,
         "car_model":car_model,
         "user_id":currentUser?.uid,
+        "price":price,
         "platenumber":platenumber,
+        "name_surname":name_surname,
       });
 
     } on FirebaseAuthException catch(error){
@@ -56,6 +83,7 @@ class _DetailPageState extends State<DetailPage> {
       Fluttertoast.showToast(msg: "Error : $error_message");
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -293,7 +321,7 @@ class _DetailPageState extends State<DetailPage> {
                             }
                             else{
                               try{
-                                createListing(
+                                createListing (
                                   widget.start_location,
                                   widget.end_location,
                                   _dateinput.text,
@@ -302,6 +330,7 @@ class _DetailPageState extends State<DetailPage> {
                                   _carbrand.text,
                                   _carmodel.text,
                                   _platenumber.text,
+                                  _price.text,
                                 );
                                 Navigator.popUntil(context, (route) =>route.isFirst);
                                 Fluttertoast.showToast(msg: "İlan başarıyla oluşturuldu.");
@@ -309,7 +338,6 @@ class _DetailPageState extends State<DetailPage> {
                                 Fluttertoast.showToast(msg: "Tüm alanların doldurulması gerekmektedir.");
                               }
                             }
-
                       },
                     ),
                   ),
