@@ -31,12 +31,11 @@ class _HomePageState extends State<HomePage> {
   }
 
 
-  Future<String> getPhoneNumber () async {
-    final FirebaseAuth _auth = FirebaseAuth.instance;
+  Future<String> getPhoneNumber (String userid) async {
     String number="";
     await FirebaseFirestore.instance
         .collection('Users')
-        .doc(_auth.currentUser?.uid)
+        .doc(userid)
         .get().then((value) {
       number=value.data()!['number'];
       print(number);
@@ -139,8 +138,7 @@ class _HomePageState extends State<HomePage> {
                         String time=data['time'];
                         String price=data['price'];
                         String name_surname=data['name_surname'];
-
-
+                        String userId=data['user_id'];
 
                         return GestureDetector(
                           onTap: (){
@@ -155,6 +153,7 @@ class _HomePageState extends State<HomePage> {
                               time: time,
                               price: price,
                               name_surname: name_surname,
+                              userId: userId,
                           ),
                         );
                         /*return ListTile(
@@ -186,6 +185,7 @@ class _HomePageState extends State<HomePage> {
         required String time,
         required String price,
         required String name_surname,
+        required String userId,
 
       } ) {
 
@@ -284,7 +284,7 @@ class _HomePageState extends State<HomePage> {
                       child: Text(name_surname),
                     ),
                     GestureDetector(child: Icon(Icons.phone),onTap: ()async{
-                      String phoneNumber= await getPhoneNumber();
+                      String phoneNumber= await getPhoneNumber(userId);
                       _makePhoneCall(phoneNumber);
                     },),
                   ],
