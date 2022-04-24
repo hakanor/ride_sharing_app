@@ -1,8 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_line/dotted_line.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
+import 'package:google_api_headers/google_api_headers.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/directions.dart';
+import 'package:google_maps_webservice/places.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // BU SAYFA İLANLARIN GENEL OLARAK LİSTELENDİĞİ SAYFA OLACAKTIR.
@@ -16,7 +20,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  final TextEditingController controller = TextEditingController();
+  late LatLng place_latlng;
+  String? googleApikey=dotenv.env['GOOGLE_API_KEY'];
+  var placeid;
+  String location = "Gitmek İstediğiniz Yer?";
+
+  TextEditingController controller = TextEditingController();
   Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance.
   collection('Listings').
   orderBy("date",descending: true).
@@ -50,6 +59,16 @@ class _HomePageState extends State<HomePage> {
         where("start_location",isEqualTo: text).
         snapshots();
       });
+  }
+
+  void resetFilters(){
+    setState(() {
+      _usersStream = FirebaseFirestore.instance.
+      collection('Listings').
+      orderBy("date",descending: true).
+      orderBy("time").snapshots();
+      controller.text="";
+    });
   }
 
   @override
@@ -110,9 +129,83 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
 
+              Container(  //search input bar
+                  child: InkWell(
+                      onTap: () async {
+                        var place = await PlacesAutocomplete.show(
+                            context: context,
+                            apiKey: googleApikey,
+                            mode: Mode.overlay,
+                            language: "tr",
+                            types: [],
+                            strictbounds: false,
+                            components: [Component(Component.country, 'tr')],
+                            //google_map_webservice package
+                            onError: (err){
+                              print(err);
+                            }
+                        );
+
+                        if(place != null){
+                          setState(() {
+                            location = place.description.toString();
+                            String? str = place.structuredFormatting?.mainText as String;
+                            location=str;
+                            controller.text=str;
+                            search(str);
+                          });
+
+                          //form google_maps_webservice package
+                          final plist = GoogleMapsPlaces(apiKey:googleApikey,
+                            apiHeaders: await GoogleApiHeaders().getHeaders(),
+                            //from google_api_headers package
+                          );
+                          String placeid = place.placeId ?? "0";
+                          final detail = await plist.getDetailsByPlaceId(placeid);
+                          final geometry = detail.result.geometry!;
+                          final lat = geometry.location.lat;
+                          final lang = geometry.location.lng;
+                          var newlatlang = LatLng(lat, lang);
+                          place_latlng=newlatlang;
+                          setState(() {
+                            placeid=placeid;
+                          });
+                        }
+                      },
+
+                      child:Padding(
+                        padding: EdgeInsets.all(15),
+                        child: Card(
+                          child: Container(
+                              padding: EdgeInsets.all(0),
+                              width: MediaQuery.of(context).size.width - 30,
+                              /*child: ListTile(
+                                title:Text(location, style: TextStyle(fontSize: 17),),
+                                trailing: GestureDetector(child: Icon(Icons.search),onTap: (){search(location);},),
+                                dense: true,
+                              ),*/
+                              child: TextField(
+                                controller: controller,
+                                enabled: false,
+                                decoration: InputDecoration(
+                                    prefixIcon: const Icon(Icons.search),
+                                    hintText: "Arama yapın",
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                      borderSide: BorderSide(color: Colors.transparent),
+                                    )
+                                ),
+                              ),
+
+                          ),
+                        ),
+                      )
+                  )
+              ),
+
               ElevatedButton(onPressed: (){setState(() {
-                _usersStream = FirebaseFirestore.instance.collection('Listings').snapshots();
-                controller.text="";
+                //CLEAR BUTTON
+                resetFilters();
               });}, child: Icon(Icons.clear)),
 
               Flexible(
@@ -125,6 +218,16 @@ class _HomePageState extends State<HomePage> {
 
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Text("Yükleniyor");
+                    }
+                    if(snapshot.hasData && snapshot.data?.size==0){
+                      return Container(
+                        child: Column(
+                          children: [
+                            Text("Eşleşen ilan yok"),
+                            ElevatedButton(child: Text("Yakın arama yap"),onPressed: (){},),
+                          ],
+                        ),
+                      );
                     }
 
                     return ListView(
@@ -156,14 +259,6 @@ class _HomePageState extends State<HomePage> {
                               userId: userId,
                           ),
                         );
-                        /*return ListTile(
-                          title: Text(str1),
-                          subtitle: Text(str2),
-                          onTap: (){
-                            print(str1);
-                            print(data['user_id']);
-                          },
-                        );*/
                       }).toList(),
                     );
                   },
