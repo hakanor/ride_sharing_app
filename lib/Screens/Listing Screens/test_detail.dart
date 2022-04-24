@@ -2,13 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 
 class DetailPage extends StatefulWidget {
 
   String start_location,end_location;
+  List<LatLng> polylineCoordinates = [];
 
-  DetailPage({required this.start_location,required this.end_location});
+  DetailPage({required this.start_location,required this.end_location,required this.polylineCoordinates});
 
   @override
   _DetailPageState createState() => _DetailPageState();
@@ -47,6 +49,15 @@ class _DetailPageState extends State<DetailPage> {
     return name+" "+surname;
   }
 
+  Future<String> setCoord () async {
+    String coord = "";
+    for (int i=0; i<widget.polylineCoordinates.length; i=i+4){
+      coord=coord+widget.polylineCoordinates[i].latitude.toString()+"-"+widget.polylineCoordinates[i].longitude.toString()+"/";
+      print(widget.polylineCoordinates[i].latitude);
+    }
+    return coord;
+  }
+
   Future createListing(
       String start_location,
       String end_location,
@@ -60,7 +71,10 @@ class _DetailPageState extends State<DetailPage> {
       ) async {
     try{
       var currentUser = await _auth.currentUser;
+
       String name_surname= await yazigetir();
+      String coord2=await setCoord();
+
       await _firestore
           .collection("Listings")
           .doc()
@@ -76,6 +90,7 @@ class _DetailPageState extends State<DetailPage> {
         "price":price,
         "platenumber":platenumber,
         "name_surname":name_surname,
+        'coord':coord2,
       });
 
     } on FirebaseAuthException catch(error){
@@ -342,6 +357,9 @@ class _DetailPageState extends State<DetailPage> {
                     ),
                   ),
                 ),
+                ElevatedButton(onPressed: (){
+                  print(widget.polylineCoordinates);
+                }, child: Text("test")),
               ],
 
             ),

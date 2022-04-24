@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
@@ -15,7 +16,7 @@ class LocationTest extends StatefulWidget {
 class _LocationTestState extends State<LocationTest> {
   String? googleApikey=dotenv.env['GOOGLE_API_KEY'];
   String location = "Bir nokta seçin";
-  LatLng place1=LatLng(37.87121931889777, 32.505299407385266);
+  LatLng place1=LatLng(37.87121931889777, 32.505299407385266); //SEÇTİĞİMİZ LOCATİON BURAYA GELECEK
   double results=0;
 
   double calculateDistance(lat1, lon1, lat2, lon2){
@@ -109,6 +110,37 @@ class _LocationTestState extends State<LocationTest> {
                   setState(() {
                     results=calculateDistance(place1.latitude, place1.longitude, 38.00770809020045, 32.51868321147034,);
                   });
+                  FirebaseFirestore.instance
+                      .collection('test')
+                      .doc("x")
+                      .get().then((value) {
+                    String coord=value.data()!['coord'];
+                    //print(coord);
+                    var splitted=coord.split('/');
+                    for(int i=0; i<splitted.length-1; i++){
+                      String x = splitted[i];
+                      //print(x);
+                      var splitted2=x.split('-');
+                      //print(splitted2);
+                      double sonuc=calculateDistance(place1.latitude, place1.longitude, double.parse(splitted2[0]), double.parse(splitted2[1]));
+                      print(sonuc);
+                      if(sonuc<1){
+                        print("BULUNDU");
+                        //break;
+                      }
+                    }
+                    print("AAAAAAAA");
+                    print(splitted);
+                    print("AAAAAAAA");
+                    print(splitted[1]);
+                    print(splitted[2]);
+                    print(splitted[3]);
+                    print(splitted[4]);
+                    print(splitted[5]);
+
+                  });
+
+
                 }, child: Text("Hesapla"),),
               ],
 

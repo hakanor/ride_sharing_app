@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -323,7 +324,11 @@ class _test_screenState extends State<test_screen> {
                         else if(placeid1==null){Fluttertoast.showToast(msg: "Başlangıç noktası belirtilmek zorunda!");}
                         else if(placeid2==null){Fluttertoast.showToast(msg: "Bitiş noktası belirtilmek zorunda!");}
                         else{
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(start_location:location , end_location: location2,)));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(
+                            start_location:location ,
+                            end_location: location2,
+                            polylineCoordinates: polylineCoordinates ,
+                          )));
                         }
 
                         /*Navigator.push(context, MaterialPageRoute(builder: (context) =>
@@ -334,21 +339,30 @@ class _test_screenState extends State<test_screen> {
                   )
               ),
 
-              /*Positioned(
+              Positioned(
                 top: 400,
                 left: 20,
                 child: ElevatedButton(onPressed: () {
                   setState(()  {
-                    _polylines.clear();
-                    polylineCoordinates.clear();
-                    setPolylines();
                   });
                   print("polylineCoord");
                   print(polylineCoordinates);
+                  String coord2="";
+                  for(int i=0; i<polylineCoordinates.length; i=i+4){
+                    coord2=coord2+polylineCoordinates[i].latitude.toString()+"-"+polylineCoordinates[i].longitude.toString()+"/";
+                  }
+
+                  String coord=polylineCoordinates.toString();
+                  coord=coord.substring(1,coord.length-1);
+                  FirebaseFirestore.instance
+                      .collection('test')
+                      .doc("x")
+                      .set({'coord':coord2}
+                  ).whenComplete(() => print("Yazi eklendi"));
 
                 }, child: Text("Test")),
               ),
-
+            /*
               Positioned(
                 top: 500,
                 left: 20,

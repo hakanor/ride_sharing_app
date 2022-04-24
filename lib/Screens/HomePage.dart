@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _usersStream = FirebaseFirestore.instance.
         collection('Listings').
-        where("start_location",isEqualTo: text).
+        where("end_location",isEqualTo: text).
         snapshots();
       });
   }
@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-
+              /*
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -128,85 +128,103 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
+              */
+              Row(
+                children: [
+                  Container(  //search input bar
+                      child: InkWell(
+                          onTap: () async {
+                            var place = await PlacesAutocomplete.show(
+                                context: context,
+                                apiKey: googleApikey,
+                                mode: Mode.overlay,
+                                language: "tr",
+                                types: [],
+                                strictbounds: false,
+                                components: [Component(Component.country, 'tr')],
+                                //google_map_webservice package
+                                onError: (err){
+                                  print(err);
+                                }
+                            );
 
-              Container(  //search input bar
-                  child: InkWell(
-                      onTap: () async {
-                        var place = await PlacesAutocomplete.show(
-                            context: context,
-                            apiKey: googleApikey,
-                            mode: Mode.overlay,
-                            language: "tr",
-                            types: [],
-                            strictbounds: false,
-                            components: [Component(Component.country, 'tr')],
-                            //google_map_webservice package
-                            onError: (err){
-                              print(err);
+                            if(place != null){
+                              setState(() {
+                                location = place.description.toString();
+                                String? str = place.structuredFormatting?.mainText as String;
+                                location=str;
+                                controller.text=str;
+                                search(str);
+                              });
+
+                              //form google_maps_webservice package
+                              final plist = GoogleMapsPlaces(apiKey:googleApikey,
+                                apiHeaders: await GoogleApiHeaders().getHeaders(),
+                                //from google_api_headers package
+                              );
+                              String placeid = place.placeId ?? "0";
+                              final detail = await plist.getDetailsByPlaceId(placeid);
+                              final geometry = detail.result.geometry!;
+                              final lat = geometry.location.lat;
+                              final lang = geometry.location.lng;
+                              var newlatlang = LatLng(lat, lang);
+                              place_latlng=newlatlang;
+                              setState(() {
+                                placeid=placeid;
+                              });
                             }
-                        );
+                          },
 
-                        if(place != null){
-                          setState(() {
-                            location = place.description.toString();
-                            String? str = place.structuredFormatting?.mainText as String;
-                            location=str;
-                            controller.text=str;
-                            search(str);
-                          });
-
-                          //form google_maps_webservice package
-                          final plist = GoogleMapsPlaces(apiKey:googleApikey,
-                            apiHeaders: await GoogleApiHeaders().getHeaders(),
-                            //from google_api_headers package
-                          );
-                          String placeid = place.placeId ?? "0";
-                          final detail = await plist.getDetailsByPlaceId(placeid);
-                          final geometry = detail.result.geometry!;
-                          final lat = geometry.location.lat;
-                          final lang = geometry.location.lng;
-                          var newlatlang = LatLng(lat, lang);
-                          place_latlng=newlatlang;
-                          setState(() {
-                            placeid=placeid;
-                          });
-                        }
-                      },
-
-                      child:Padding(
-                        padding: EdgeInsets.all(15),
-                        child: Card(
-                          child: Container(
-                              padding: EdgeInsets.all(0),
-                              width: MediaQuery.of(context).size.width - 30,
-                              /*child: ListTile(
+                          child:Padding(
+                            padding: EdgeInsets.only(left:7),
+                            child: Card(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width - 80,
+                                height: 40,
+                                /*child: ListTile(
                                 title:Text(location, style: TextStyle(fontSize: 17),),
                                 trailing: GestureDetector(child: Icon(Icons.search),onTap: (){search(location);},),
                                 dense: true,
                               ),*/
-                              child: TextField(
-                                controller: controller,
-                                enabled: false,
-                                decoration: InputDecoration(
-                                    prefixIcon: const Icon(Icons.search),
-                                    hintText: "Arama yapın",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(4),
-                                      borderSide: BorderSide(color: Colors.transparent),
-                                    )
+                                child: TextField(
+                                  controller: controller,
+                                  enabled: false,
+                                  decoration: InputDecoration(
+                                      prefixIcon: const Icon(Icons.search),
+                                      hintText: "Nereye Gitmek İstiyorsunuz?",
+                                      contentPadding: EdgeInsets.symmetric(vertical: 5),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(4),
+                                        borderSide: BorderSide(color: Colors.transparent),
+                                      )
+                                  ),
                                 ),
+
                               ),
-
-                          ),
-                        ),
+                            ),
+                          )
                       )
-                  )
-              ),
+                  ),
 
-              ElevatedButton(onPressed: (){setState(() {
-                //CLEAR BUTTON
-                resetFilters();
-              });}, child: Icon(Icons.clear)),
+                  ElevatedButton(//RESET FILTER BUTTON
+                    onPressed: () {
+                      setState(() {
+                        resetFilters();
+                      });
+                    },
+                    child: Icon(Icons.clear),
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all(CircleBorder()),
+                      padding: MaterialStateProperty.all(EdgeInsets.all(3)),
+                      backgroundColor: MaterialStateProperty.all(Colors.blue), // <-- Button color
+                      overlayColor: MaterialStateProperty.resolveWith<Color?>((states) {
+                        if (states.contains(MaterialState.pressed)) return Colors.red; // <-- Splash color
+                      }),
+                    ),
+                  ),
+
+                ],
+              ),
 
               Flexible(
                 child: StreamBuilder<QuerySnapshot>(
@@ -221,11 +239,23 @@ class _HomePageState extends State<HomePage> {
                     }
                     if(snapshot.hasData && snapshot.data?.size==0){
                       return Container(
-                        child: Column(
-                          children: [
-                            Text("Eşleşen ilan yok"),
-                            ElevatedButton(child: Text("Yakın arama yap"),onPressed: (){},),
-                          ],
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("Eşleşen ilan yok",style: TextStyle(fontSize: 20),),
+                              ),
+                              ElevatedButton(
+                                child: Text("Yakın arama yap"),
+                                onPressed: (){
+                                  print(place_latlng);
+
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     }
