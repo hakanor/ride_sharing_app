@@ -3,11 +3,14 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/directions.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'FindNearestPage.dart';
 
 // BU SAYFA İLANLARIN GENEL OLARAK LİSTELENDİĞİ SAYFA OLACAKTIR.
 
@@ -250,8 +253,7 @@ class _HomePageState extends State<HomePage> {
                               ElevatedButton(
                                 child: Text("Yakın arama yap"),
                                 onPressed: (){
-                                  print(place_latlng);
-
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => FindNearestPage(place_latlng: place_latlng,)));
                                 },
                               ),
                             ],
@@ -263,8 +265,6 @@ class _HomePageState extends State<HomePage> {
                     return ListView(
                       children: snapshot.data!.docs.map((DocumentSnapshot document) {
                         Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-                        //String str1= data['start_location']+" ->  "+data['end_location'];
-                        //String str2= "Saat : "+ data['time']+" Tarih: "+data['date'];
                         String start_location=data['start_location'];
                         String end_location=data['end_location'];
                         String date=data['date'];
@@ -272,11 +272,10 @@ class _HomePageState extends State<HomePage> {
                         String price=data['price'];
                         String name_surname=data['name_surname'];
                         String userId=data['user_id'];
-
                         return GestureDetector(
                           onTap: (){
                             //TIKLANILDIĞI ZAMAN İLAN DETAY SAYFASINA GİTMESİ İÇİN GESTURE
-                            print(data['user_id']);
+                            Fluttertoast.showToast(msg: document.id);
                             },
                           child: buildTripCard(
                               context,

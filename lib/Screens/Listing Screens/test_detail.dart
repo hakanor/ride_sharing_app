@@ -49,7 +49,8 @@ class _DetailPageState extends State<DetailPage> {
     return name+" "+surname;
   }
 
-  Future<String> setCoord () async {
+  Future<String> setCoordinates () async {
+    // İki nokta arasındaki koordinat bilgilerinin formatlanması
     String coord = "";
     for (int i=0; i<widget.polylineCoordinates.length; i=i+4){
       coord=coord+widget.polylineCoordinates[i].latitude.toString()+"-"+widget.polylineCoordinates[i].longitude.toString()+"/";
@@ -73,7 +74,7 @@ class _DetailPageState extends State<DetailPage> {
       var currentUser = await _auth.currentUser;
 
       String name_surname= await yazigetir();
-      String coord2=await setCoord();
+      String coordinates=await setCoordinates();
 
       await _firestore
           .collection("Listings")
@@ -90,7 +91,7 @@ class _DetailPageState extends State<DetailPage> {
         "price":price,
         "platenumber":platenumber,
         "name_surname":name_surname,
-        'coord':coord2,
+        'coord':coordinates,
       });
 
     } on FirebaseAuthException catch(error){
@@ -357,9 +358,6 @@ class _DetailPageState extends State<DetailPage> {
                     ),
                   ),
                 ),
-                ElevatedButton(onPressed: (){
-                  print(widget.polylineCoordinates);
-                }, child: Text("test")),
               ],
 
             ),

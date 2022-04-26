@@ -338,41 +338,6 @@ class _test_screenState extends State<test_screen> {
                       },
                   )
               ),
-
-              Positioned(
-                top: 400,
-                left: 20,
-                child: ElevatedButton(onPressed: () {
-                  setState(()  {
-                  });
-                  print("polylineCoord");
-                  print(polylineCoordinates);
-                  String coord2="";
-                  for(int i=0; i<polylineCoordinates.length; i=i+4){
-                    coord2=coord2+polylineCoordinates[i].latitude.toString()+"-"+polylineCoordinates[i].longitude.toString()+"/";
-                  }
-
-                  String coord=polylineCoordinates.toString();
-                  coord=coord.substring(1,coord.length-1);
-                  FirebaseFirestore.instance
-                      .collection('test')
-                      .doc("x")
-                      .set({'coord':coord2}
-                  ).whenComplete(() => print("Yazi eklendi"));
-
-                }, child: Text("Test")),
-              ),
-            /*
-              Positioned(
-                top: 500,
-                left: 20,
-                child: ElevatedButton(onPressed: () async {
-                    print(await searchNearby('Mevlana Otopark'));
-                    print(await "Selam");
-                    print(await searchNearbyWithout());
-                }, child: Text("test2")),
-              )
-            */
             ]
         )
     );
