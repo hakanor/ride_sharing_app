@@ -2,7 +2,7 @@ import 'package:ride_sharing_app/Screens/Login%20Screens/PasswordResetPage.dart'
 import 'package:ride_sharing_app/Services/auth_service.dart';
 import 'package:ride_sharing_app/Screens/Login%20Screens/RegisterPage.dart';
 import 'package:flutter/material.dart';
-import '../MyHomePage.dart';
+import '../MainPage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
     try{
       await FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _passwordController.text)
           .then((kullanici) {
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=> MyHomePage(title: 'Araç Paylaşım',)),(Route<dynamic>route)=>false);
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=> MainPage(title: 'Araç Paylaşım',)),(Route<dynamic>route)=>false);
       }).whenComplete(() => print("Giriş Yapıldı"));
     } on FirebaseAuthException catch(error){
       String? error_message=error.message;

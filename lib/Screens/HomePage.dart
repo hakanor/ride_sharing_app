@@ -9,7 +9,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/directions.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import 'FindNearestPage.dart';
 
 // BU SAYFA İLANLARIN GENEL OLARAK LİSTELENDİĞİ SAYFA OLACAKTIR.
@@ -184,11 +183,6 @@ class _HomePageState extends State<HomePage> {
                               child: Container(
                                 width: MediaQuery.of(context).size.width - 80,
                                 height: 40,
-                                /*child: ListTile(
-                                title:Text(location, style: TextStyle(fontSize: 17),),
-                                trailing: GestureDetector(child: Icon(Icons.search),onTap: (){search(location);},),
-                                dense: true,
-                              ),*/
                                 child: TextField(
                                   controller: controller,
                                   enabled: false,
@@ -238,7 +232,15 @@ class _HomePageState extends State<HomePage> {
                     }
 
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Text("Yükleniyor");
+                      return Container(
+                        child: Center(
+                          child: Column(
+                            children: [
+                              CircularProgressIndicator(),
+                            ],
+                          ),
+                        ),
+                      );
                     }
                     if(snapshot.hasData && snapshot.data?.size==0){
                       return Container(
