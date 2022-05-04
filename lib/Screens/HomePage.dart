@@ -54,6 +54,17 @@ class _HomePageState extends State<HomePage> {
     return b;
   }
 
+  Future<String> getNameSurname(String uid)async {
+    String b="";
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(uid)
+        .get().then((value) {
+      b=value.data()!['name']+" "+value.data()!['surname'];
+    });
+    return b;
+  }
+
 
   @override
   void initState() {
@@ -84,22 +95,10 @@ class _HomePageState extends State<HomePage> {
         .doc(userid)
         .get().then((value) {
       number=value.data()!['number'];
-      print(number);
     });
     return number;
   }
 
-  Future<String> getNameSurname (String userid) async {
-    String name_surname="";
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(userid)
-        .get().then((value) {
-      name_surname=value.data()!['name']+" "+value.data()!['surname'];
-      print(name_surname);
-    });
-    return name_surname;
-  }
 
   void search(String text){
       setState(() {
@@ -456,6 +455,7 @@ class _HomePageState extends State<HomePage> {
                         child: Text("$price TL ", style: new TextStyle(fontSize: 22.0),)),
                     Spacer(),
 
+                    // PROFILE PHOTO
                     FutureBuilder<String>(
                       future: getImageUrl(userId), // async work
                       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
@@ -492,10 +492,28 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
 
+                    //name_surname
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(name_surname),
+                      child: FutureBuilder<String>(
+                        future: getNameSurname(userId), // async work
+                        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.waiting: return CircularProgressIndicator();
+                            default:
+                              if (snapshot.hasError)
+                                return Text('Error: ${snapshot.error}');
+                              else{
+                                String? name_surname_from_users=snapshot.data;
+                                name_surname=snapshot.data!;
+                                return Text(name_surname_from_users!);
+                              }
+                          }
+                        },
+                      ),
                     ),
+
+                    // ICON SEND MESSAGE
                     GestureDetector(child: Icon(Icons.message_outlined),onTap: ()async{
                       final FirebaseAuth _auth = FirebaseAuth.instance;
                       var ref = FirebaseFirestore.instance.collection('Conversations');
