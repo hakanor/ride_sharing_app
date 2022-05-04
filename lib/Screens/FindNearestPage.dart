@@ -67,7 +67,7 @@ class _FindNearestPageState extends State<FindNearestPage> {
               children: [
                 Padding(
                   padding:
-                  EdgeInsets.only(top: size.height * .05),
+                  EdgeInsets.only(top: size.height * .06),
                   child: Align(
                     alignment: Alignment.topLeft,
                     child: Row(
@@ -75,6 +75,17 @@ class _FindNearestPageState extends State<FindNearestPage> {
                       children: [
                         Container(
                           width: ((size.width)-40)/3,
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: IconButton(
+                              onPressed: () {Navigator.pop(context);},
+                              icon: Icon(
+                                Icons.arrow_back_ios_outlined,
+                                color: Colors.blue.withOpacity(.75),
+                                size: 24,
+                              ),
+                            ),
+                          ),
                         ),
                         Container(
                           child: Center(
@@ -110,7 +121,6 @@ class _FindNearestPageState extends State<FindNearestPage> {
 
                       return ListView(
                         children: snapshot.data!.docs.map((DocumentSnapshot document) {
-
                           Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
                           String start_location=data['start_location'];
                           String end_location=data['end_location'];
