@@ -51,8 +51,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-
-
   TextEditingController controller = TextEditingController();
   Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance.
   collection('Listings').
@@ -315,25 +313,7 @@ class _HomePageState extends State<HomePage> {
                         return GestureDetector(
                           onTap: () async {
                             //TIKLANILDIĞI ZAMAN İLAN DETAY SAYFASINA GİTMESİ İÇİN GESTURE
-                            Fluttertoast.showToast(msg: document.id);
-                            final FirebaseAuth _auth = FirebaseAuth.instance;
-                            var ref =FirebaseFirestore.instance.collection('Conversations');
-                            var documentRef = await ref.add(
-                              {
-                                'displayMessage':'',
-                                'members':[userId,_auth.currentUser?.uid],
-                                'name_surname':name_surname,
-                                'name_surname2':name_surname_current,
-                              }
-                            );//CONVERSATION OLUSTURULDU
-
-                            //ŞİMDİ DE DİREKT SAYFAYA GİDİLİYOR.
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationPage(
-                              userId: userId,
-                              conversationId: documentRef.id,
-                            )));
-
-
+                            Fluttertoast.showToast(msg: document.id); //TODO DELETE IT LATER
                             },
                           child: buildTripCard(
                               context,
@@ -465,9 +445,29 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.only(right: 8.0),
                       child: Text(name_surname),
                     ),
-                    GestureDetector(child: Icon(Icons.phone),onTap: ()async{
+                    GestureDetector(child: Icon(Icons.message_outlined),onTap: ()async{
+                      final FirebaseAuth _auth = FirebaseAuth.instance;
+                      var ref = FirebaseFirestore.instance.collection('Conversations');
+                      var documentRef = await ref.add(
+                          {
+                            'displayMessage':'',
+                            'members':[userId,_auth.currentUser?.uid],
+                            'name_surname':name_surname,
+                            'name_surname2':name_surname_current,
+                          }
+                      );//CONVERSATION OLUSTURULDU
+
+                      //ŞİMDİ DE DİREKT SAYFAYA GİDİLİYOR.
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationPage(
+                        userId: userId,
+                        conversationId: documentRef.id,
+                      )));
+
+                      /* PHONE CALL FEATURE does not need anymore
                       String phoneNumber= await getPhoneNumber(userId);
                       _makePhoneCall(phoneNumber);
+                       */
+
                     },),
                   ],
                 ),

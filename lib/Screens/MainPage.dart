@@ -55,7 +55,7 @@ class _MainPageState extends State<MainPage> {
             label: "Tüm İlanlar",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add_outlined),
+            icon: Icon(Icons.add_circle),
             label: "Ekle",
           ),
           BottomNavigationBarItem(
