@@ -43,6 +43,17 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<String> getImageUrl(String uid)async {
+    String b="";
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(uid)
+        .get().then((value) {
+      b=value.data()!['Image'];
+    });
+    return b;
+  }
+
 
   @override
   void initState() {
@@ -444,6 +455,43 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Text("$price TL ", style: new TextStyle(fontSize: 22.0),)),
                     Spacer(),
+
+                    FutureBuilder<String>(
+                      future: getImageUrl(userId), // async work
+                      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.waiting: return CircularProgressIndicator();
+                          default:
+                            if (snapshot.hasError)
+                              return Text('Error: ${snapshot.error}');
+                            else{
+                              String? url=snapshot.data;
+                              return Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.blue,width: 1),
+                                    borderRadius: BorderRadius.circular(100),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.grey.withOpacity(.55),
+                                          blurRadius: 10,
+                                          spreadRadius: 2)
+                                    ],
+                                  ),
+                                  height: 25,
+                                  width: 25,
+                                  child: CircleAvatar(
+                                    backgroundImage:
+                                    NetworkImage(url!),
+                                  ),
+                                ),
+                              );
+                            }
+                        }
+                      },
+                    ),
+
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: Text(name_surname),
