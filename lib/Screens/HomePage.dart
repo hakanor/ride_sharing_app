@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_line/dotted_line.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
@@ -8,7 +9,9 @@ import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/directions.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:ride_sharing_app/Services/auth_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'Chat Screens/ConversationPage.dart';
 import 'FindNearestPage.dart';
 
 // BU SAYFA İLANLARIN GENEL OLARAK LİSTELENDİĞİ SAYFA OLACAKTIR.
@@ -26,6 +29,29 @@ class _HomePageState extends State<HomePage> {
   String? googleApikey=dotenv.env['GOOGLE_API_KEY'];
   var placeid;
   String location = "Gitmek İstediğiniz Yer?";
+
+  AuthService auth =AuthService();
+  String name_surname_current="";
+  String currentUserId="";
+
+  void yazigetir(String userId)async{
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userId)
+        .get().then((value) {
+      name_surname_current=value.data()!['name']+" "+value.data()!['surname'];
+    });
+  }
+
+
+  @override
+  void initState() {
+    currentUserId=auth.UserIdbul();
+    yazigetir(currentUserId);
+    super.initState();
+  }
+
+
 
   TextEditingController controller = TextEditingController();
   Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance.
@@ -52,6 +78,18 @@ class _HomePageState extends State<HomePage> {
       print(number);
     });
     return number;
+  }
+
+  Future<String> getNameSurname (String userid) async {
+    String name_surname="";
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userid)
+        .get().then((value) {
+      name_surname=value.data()!['name']+" "+value.data()!['surname'];
+      print(name_surname);
+    });
+    return name_surname;
   }
 
   void search(String text){
@@ -275,9 +313,27 @@ class _HomePageState extends State<HomePage> {
                         String name_surname=data['name_surname'];
                         String userId=data['user_id'];
                         return GestureDetector(
-                          onTap: (){
+                          onTap: () async {
                             //TIKLANILDIĞI ZAMAN İLAN DETAY SAYFASINA GİTMESİ İÇİN GESTURE
                             Fluttertoast.showToast(msg: document.id);
+                            final FirebaseAuth _auth = FirebaseAuth.instance;
+                            var ref =FirebaseFirestore.instance.collection('Conversations');
+                            var documentRef = await ref.add(
+                              {
+                                'displayMessage':'',
+                                'members':[userId,_auth.currentUser?.uid],
+                                'name_surname':name_surname,
+                                'name_surname2':name_surname_current,
+                              }
+                            );//CONVERSATION OLUSTURULDU
+
+                            //ŞİMDİ DE DİREKT SAYFAYA GİDİLİYOR.
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationPage(
+                              userId: userId,
+                              conversationId: documentRef.id,
+                            )));
+
+
                             },
                           child: buildTripCard(
                               context,

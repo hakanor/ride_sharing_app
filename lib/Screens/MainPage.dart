@@ -1,3 +1,4 @@
+import 'package:ride_sharing_app/Screens/Chat%20Screens/MainChatPage.dart';
 import 'package:ride_sharing_app/Screens/Listing%20Screens/test_screen.dart';
 import 'package:ride_sharing_app/Screens/MyListingsPage.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class _MainPageState extends State<MainPage> {
     HomePage(),
     test_screen(),
     MyListingsPage(),
+    MainChatPage(),
     ProfilePage(),
   ];
   int _currentIndex=0;
@@ -59,6 +61,10 @@ class _MainPageState extends State<MainPage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment),
             label: "İlanlarım",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.message),
+            label: "Mesajlar",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),

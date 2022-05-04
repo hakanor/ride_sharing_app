@@ -73,8 +73,6 @@ class AuthService {
     var currentUser = _auth.currentUser;
     if (currentUser != null) {
       id=currentUser.uid;
-      print("SU AN GİRİŞ YAPILMIS KULLANICININ İD'Sİ");
-      print(id);
     }
     return id;
   }

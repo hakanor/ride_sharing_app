@@ -239,13 +239,40 @@ class _PersonalAdsState extends State<MyListingsPage> {
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: GestureDetector(
-                        child: Icon(Icons.remove),
+                        child: Icon(Icons.delete),
                         onTap: (){
-                          //Bu Direkt olarak siliyor dikkatli kullanılması lazım . Bir Alert dialog eklenebilir .
-                          FirebaseFirestore.instance
-                              .collection('Listings')
-                              .doc(doc_id)
-                              .delete();
+
+                          Widget cancelButton = TextButton(
+                            child: Text("İptal"),
+                            onPressed:  () {Navigator.pop(context);},
+                          );
+                          Widget continueButton = TextButton(
+                            child: Text("Sil"),
+                            onPressed:  () {
+                              FirebaseFirestore.instance
+                                  .collection('Listings')
+                                  .doc(doc_id)
+                                  .delete();
+                              Navigator.pop(context);
+                            },
+                          );
+
+                          // set up the AlertDialog
+                          AlertDialog alert = AlertDialog(
+                            title: Text("Uyarı"),
+                            content: Text("İlanı Kaldırmak İstediğinize emin misiniz?"),
+                            actions: [
+                              cancelButton,
+                              continueButton,
+                            ],
+                          );
+                          showDialog(
+                              barrierDismissible: true,//tapping outside dialog will close the dialog if set 'true'
+                              context: context,
+                              builder: (context){
+                                return alert;
+                              }
+                          );
                         },
                       )
                     ),
