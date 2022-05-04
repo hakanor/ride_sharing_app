@@ -451,22 +451,27 @@ class _HomePageState extends State<HomePage> {
                     GestureDetector(child: Icon(Icons.message_outlined),onTap: ()async{
                       final FirebaseAuth _auth = FirebaseAuth.instance;
                       var ref = FirebaseFirestore.instance.collection('Conversations');
-                      var documentRef = await ref.add(
-                          {
-                            'displayMessage':'',
-                            'members':[userId,_auth.currentUser?.uid],
-                            'name_surname':name_surname,
-                            'name_surname2':name_surname_current,
-                            'start_location':start_location,
-                            'end_location':end_location,
-                          }
-                      );//CONVERSATION OLUSTURULDU
+                      if(userId==currentUserId){
+                        Fluttertoast.showToast(msg: "Kendinize mesaj gönderemezsiniz!"); //TODO DELETE IT LATER
+                      }
+                      else{
+                        var documentRef = await ref.add(
+                            {
+                              'displayMessage':'',
+                              'members':[userId,_auth.currentUser?.uid],
+                              'name_surname':name_surname,
+                              'name_surname2':name_surname_current,
+                              'start_location':start_location,
+                              'end_location':end_location,
+                            }
+                        );//CONVERSATION OLUSTURULDU
 
-                      //ŞİMDİ DE DİREKT SAYFAYA GİDİLİYOR.
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationPage(
-                        userId: userId,
-                        conversationId: documentRef.id,
-                      )));
+                        //ŞİMDİ DE DİREKT SAYFAYA GİDİLİYOR.
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationPage(
+                          userId: userId,
+                          conversationId: documentRef.id,
+                        )));
+                      }
 
                       /* PHONE CALL FEATURE does not need anymore
                       String phoneNumber= await getPhoneNumber(userId);
