@@ -11,7 +11,8 @@ import 'package:url_launcher/url_launcher.dart';
 class FindNearestPage extends StatefulWidget {
 
   LatLng place_latlng;
-  FindNearestPage({required this.place_latlng});
+  final String placename;
+  FindNearestPage({required this.place_latlng, required this.placename,});
 
   @override
   _FindNearestPageState createState() => _FindNearestPageState();
@@ -126,7 +127,7 @@ class _FindNearestPageState extends State<FindNearestPage> {
                             var splitted2=x.split('-');
                             double sonuc=calculateDistance(widget.place_latlng.latitude, widget.place_latlng.longitude, double.parse(splitted2[0]), double.parse(splitted2[1]));
                             print(sonuc);
-                            if(sonuc<1){
+                            if(sonuc<1 && start_location!= widget.placename){
                               print("Bulundu");
                               return GestureDetector(
                                 onTap: (){

@@ -291,7 +291,10 @@ class _HomePageState extends State<HomePage> {
                               ElevatedButton(
                                 child: Text("Yakın arama yap"),
                                 onPressed: (){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => FindNearestPage(place_latlng: place_latlng,)));
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => FindNearestPage(
+                                    place_latlng: place_latlng,
+                                    placename: location,
+                                  )));
                                 },
                               ),
                             ],
