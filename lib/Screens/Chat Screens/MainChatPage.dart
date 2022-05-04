@@ -17,6 +17,7 @@ class _MainChatPageState extends State<MainChatPage> {
 
   String userId="";
   late Future<String> _dataFuture;
+  late Future<String> _imageUrlFuture;
 
   Future<String> getNameSurname(String uid)async {
     String b="";
@@ -25,6 +26,18 @@ class _MainChatPageState extends State<MainChatPage> {
         .doc(uid)
         .get().then((value) {
       b=value.data()!['name']+" "+value.data()!['surname'];
+    });
+    return b;
+  }
+
+
+  Future<String> getImageUrl(String uid)async {
+    String b="";
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(uid)
+        .get().then((value) {
+      b=value.data()!['Image'];
     });
     return b;
   }
@@ -109,7 +122,13 @@ class _MainChatPageState extends State<MainChatPage> {
                           String name_surname2=data['name_surname2'];
                           String displayMessage = data['displayMessage'];
                           List members=data["members"]; //kullanılmayan
-
+                          String urlsend="";
+                          if(members[0]==userId){
+                            urlsend=members[1];
+                          }
+                          else{
+                            urlsend=members[0];
+                          }
 
                           if(displayMessage.length>30){
                             displayMessage=displayMessage.substring(0,30)+"...";
@@ -119,9 +138,24 @@ class _MainChatPageState extends State<MainChatPage> {
                             children: [
                               ListTile(
                                 tileColor: Colors.white,
-                                leading: CircleAvatar(
-                                  backgroundImage:
-                                  NetworkImage(url==""?url2 : url),),
+                                leading: FutureBuilder<String>(
+                                  future: getImageUrl(urlsend), // async work
+                                  builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                                    switch (snapshot.connectionState) {
+                                      case ConnectionState.waiting: return Text('Yükleniyor');
+                                      default:
+                                        if (snapshot.hasError)
+                                          return Text('Error: ${snapshot.error}');
+                                        else{
+                                          String? url=snapshot.data;
+                                          return CircleAvatar(
+                                              backgroundImage:
+                                              NetworkImage(url!),
+                                          );
+                                        }
+                                    }
+                                  },
+                                ),
 
                                 title: FutureBuilder<String>(
                                   future: _dataFuture, // async work
@@ -206,7 +240,6 @@ class _MainChatPageState extends State<MainChatPage> {
                   },
                 ),
               ),
-
             ],
           ),
         ),
