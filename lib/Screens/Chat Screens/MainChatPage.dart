@@ -17,7 +17,6 @@ class _MainChatPageState extends State<MainChatPage> {
 
   String userId="";
   late Future<String> _dataFuture;
-  late Future<String> _imageUrlFuture;
 
   Future<String> getNameSurname(String uid)async {
     String b="";
@@ -142,7 +141,7 @@ class _MainChatPageState extends State<MainChatPage> {
                                   future: getImageUrl(urlsend), // async work
                                   builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                                     switch (snapshot.connectionState) {
-                                      case ConnectionState.waiting: return Text('Yükleniyor');
+                                      case ConnectionState.waiting: return CircularProgressIndicator();
                                       default:
                                         if (snapshot.hasError)
                                           return Text('Error: ${snapshot.error}');
@@ -195,7 +194,7 @@ class _MainChatPageState extends State<MainChatPage> {
                                   padding: const EdgeInsets.only(top:1,right: 1,),
                                   child: Column(
                                     children: [
-                                      Text(data['time']==null ?"" : data['time']), //TODO timestamps
+                                      Text(data['time_formatted']==null ?"" : data['time_formatted']),
                                       Container(
                                         child: Center(
                                           child: Text("16",style: TextStyle(fontSize: 11,color: Colors.white,fontWeight: FontWeight.bold),),

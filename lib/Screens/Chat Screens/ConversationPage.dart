@@ -22,13 +22,6 @@ class _ConversationPageState extends State<ConversationPage> {
   String url2="https://firebasestorage.googleapis.com/v0/b/ride-sharing-app-389d2.appspot.com/o/avatar3.png?alt=media&token=7088e5e8-2fee-4f28-aad7-8bd53a0bacad";
 
   void yazigetir()async {
-    List a=[];
-    await FirebaseFirestore.instance
-        .collection('Conversations')
-        .doc(widget.conversationId)
-        .get().then((value) {
-      a=value.data()!['members'];
-    });
 
       String b="";
       await FirebaseFirestore.instance
@@ -43,14 +36,6 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
     void getProfilePicture()async {
-    List a=[];
-    await FirebaseFirestore.instance
-        .collection('Conversations')
-        .doc(widget.conversationId)
-        .get().then((value) {
-      a=value.data()!['members'];
-    });
-
     String b="";
     await FirebaseFirestore.instance
         .collection('Users')
@@ -151,7 +136,7 @@ class _ConversationPageState extends State<ConversationPage> {
                                     ),
                                     Positioned(bottom:0,right: 0,child: Padding(
                                       padding: const EdgeInsets.only(right: 3,bottom: 3),
-                                      child: Text(document['time'],style: TextStyle(color: Colors.white,fontSize: 10),),
+                                      child: Text(document['time_formatted'],style: TextStyle(color: Colors.white,fontSize: 10),),
                                     )),
                                   ],
                                 )
@@ -203,6 +188,7 @@ class _ConversationPageState extends State<ConversationPage> {
                               _seconds="0"+_seconds;
                             }
                             String time= _hour+ ":" +_minute +":"+_seconds;
+                            String time_formatted= _hour+ ":" +_minute;
 
                             await _ref.add({
                               'senderId' : widget.userId,
@@ -210,6 +196,7 @@ class _ConversationPageState extends State<ConversationPage> {
                               'timeStamp' : DateTime.now(),
                               'date':formattedDate,
                               'time':time,
+                              'time_formatted':time_formatted,
                             });
 
                             var collection = FirebaseFirestore.instance.collection('Conversations');
@@ -218,6 +205,7 @@ class _ConversationPageState extends State<ConversationPage> {
                                 .update({
                                   'displayMessage' : _editingController.text,
                                   'time':time,
+                                  'time_formatted':time_formatted,
                                   }) // <-- Nested value
                                 .catchError((error) => print('Update failed: $error'));
 
@@ -248,6 +236,7 @@ class _ConversationPageState extends State<ConversationPage> {
 
                           String _hour = now.hour.toString();
                           String _minute = now.minute.toString();
+                          String _seconds = now.second.toString();
 
                           if(now.hour<10){
                             _hour="0"+_hour;
@@ -255,8 +244,8 @@ class _ConversationPageState extends State<ConversationPage> {
                           if(now.minute<10){
                             _minute="0"+_minute;
                           }
-                          String time= _hour+ ":" +_minute;
-
+                          String time= _hour+ ":" +_minute+":"+_seconds;
+                          String time_formatted= _hour+ ":" +_minute;
 
                           await _ref.add({
                             'senderId' : widget.userId,
@@ -264,6 +253,7 @@ class _ConversationPageState extends State<ConversationPage> {
                             'timeStamp' : DateTime.now(),
                             'date':formattedDate,
                             'time':time,
+                            'time_formatted':time_formatted,
                           });
 
                           var collection = FirebaseFirestore.instance.collection('Conversations');
@@ -272,6 +262,7 @@ class _ConversationPageState extends State<ConversationPage> {
                               .update({
                                 'displayMessage' : _editingController.text,
                                 'time':time,
+                                'time_formatted':time_formatted,
                               }) // <-- Nested value
                               .catchError((error) => print('Update failed: $error'));
 
