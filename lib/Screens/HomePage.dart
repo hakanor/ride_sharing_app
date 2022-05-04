@@ -457,6 +457,8 @@ class _HomePageState extends State<HomePage> {
                             'members':[userId,_auth.currentUser?.uid],
                             'name_surname':name_surname,
                             'name_surname2':name_surname_current,
+                            'start_location':start_location,
+                            'end_location':end_location,
                           }
                       );//CONVERSATION OLUSTURULDU
 

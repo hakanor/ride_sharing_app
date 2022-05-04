@@ -33,7 +33,7 @@ class _ConversationPageState extends State<ConversationPage> {
       String b="";
       await FirebaseFirestore.instance
           .collection('Users')
-          .doc(a[1])
+          .doc(widget.userId)
           .get().then((value) {
         b=value.data()!['name']+ " " +value.data()!['surname'];
         setState(() {
@@ -54,7 +54,7 @@ class _ConversationPageState extends State<ConversationPage> {
     String b="";
     await FirebaseFirestore.instance
         .collection('Users')
-        .doc(a[1])
+        .doc(widget.userId)
         .get().then((value) {
       b=value.data()!['Image'];
       setState(() {
@@ -191,6 +191,7 @@ class _ConversationPageState extends State<ConversationPage> {
 
                             String _hour = now.hour.toString();
                             String _minute = now.minute.toString();
+                            String _seconds= now.second.toString();
 
                             if(now.hour<10){
                               _hour="0"+_hour;
@@ -198,7 +199,10 @@ class _ConversationPageState extends State<ConversationPage> {
                             if(now.minute<10){
                               _minute="0"+_minute;
                             }
-                            String time= _hour+ ":" +_minute;
+                            if(now.second<10){
+                              _seconds="0"+_seconds;
+                            }
+                            String time= _hour+ ":" +_minute +":"+_seconds;
 
                             await _ref.add({
                               'senderId' : widget.userId,

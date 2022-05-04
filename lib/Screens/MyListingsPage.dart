@@ -51,10 +51,7 @@ class _PersonalAdsState extends State<MyListingsPage> {
                             ),
                           ),
                         ),
-                        Container(
-                          width: ((size.width)-40)/3,
-                        ),
-
+                        Spacer(),
                       ],
                     ),
                   ),
