@@ -3,7 +3,7 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import '../Services/auth_service.dart';
+import 'package:ride_sharing_app/Screens/EditListingPage.dart';
 
 class MyListingsPage extends StatefulWidget {
   const MyListingsPage({Key? key}) : super(key: key);
@@ -233,6 +233,16 @@ class _PersonalAdsState extends State<MyListingsPage> {
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Text("$price TL ", style: new TextStyle(fontSize: 22.0),)),
                     Spacer(),
+
+                    Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: GestureDetector(
+                          child: Icon(Icons.edit),
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => EditListingPage(listingId: doc_id)));
+                          },
+                        )
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: GestureDetector(

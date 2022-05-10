@@ -1,10 +1,13 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_line/dotted_line.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'Chat Screens/ConversationPage.dart';
 
 // BU SAYFA İLANLARIN GENEL OLARAK LİSTELENDİĞİ SAYFA OLACAKTIR.
 
@@ -19,6 +22,10 @@ class FindNearestPage extends StatefulWidget {
 }
 
 class _FindNearestPageState extends State<FindNearestPage> {
+
+
+  String currentUserId="";
+  String name_surname_current="";
 
   TextEditingController controller = TextEditingController();
   Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance.
@@ -43,6 +50,15 @@ class _FindNearestPageState extends State<FindNearestPage> {
   }
 
 
+  void yazigetir(String userId)async{
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userId)
+        .get().then((value) {
+      name_surname_current=value.data()!['name']+" "+value.data()!['surname'];
+    });
+  }
+
   Future<String> getPhoneNumber (String userid) async {
     String number="";
     await FirebaseFirestore.instance
@@ -53,6 +69,28 @@ class _FindNearestPageState extends State<FindNearestPage> {
       print(number);
     });
     return number;
+  }
+
+  Future<String> getImageUrl(String uid)async {
+    String b="";
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(uid)
+        .get().then((value) {
+      b=value.data()!['Image'];
+    });
+    return b;
+  }
+
+  Future<String> getNameSurname(String uid)async {
+    String b="";
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(uid)
+        .get().then((value) {
+      b=value.data()!['name']+" "+value.data()!['surname'];
+    });
+    return b;
   }
 
 
@@ -275,13 +313,94 @@ class _FindNearestPageState extends State<FindNearestPage> {
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Text("$price TL ", style: new TextStyle(fontSize: 22.0),)),
                     Spacer(),
+
+                    FutureBuilder<String>(
+                      future: getImageUrl(userId), // async work
+                      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.waiting: return CircularProgressIndicator();
+                          default:
+                            if (snapshot.hasError)
+                              return Text('Error: ${snapshot.error}');
+                            else{
+                              String? url=snapshot.data;
+                              return Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.blue,width: 1),
+                                    borderRadius: BorderRadius.circular(100),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.grey.withOpacity(.55),
+                                          blurRadius: 10,
+                                          spreadRadius: 2)
+                                    ],
+                                  ),
+                                  height: 25,
+                                  width: 25,
+                                  child: CircleAvatar(
+                                    backgroundImage:
+                                    NetworkImage(url!),
+                                  ),
+                                ),
+                              );
+                            }
+                        }
+                      },
+                    ),
+
+
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(name_surname),
+                      child: FutureBuilder<String>(
+                        future: getNameSurname(userId), // async work
+                        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.waiting: return CircularProgressIndicator();
+                            default:
+                              if (snapshot.hasError)
+                                return Text('Error: ${snapshot.error}');
+                              else{
+                                String? name_surname_from_users=snapshot.data;
+                                name_surname=snapshot.data!;
+                                return Text(name_surname_from_users!);
+                              }
+                          }
+                        },
+                      ),
                     ),
-                    GestureDetector(child: Icon(Icons.phone),onTap: ()async{
+
+                    GestureDetector(child: Icon(Icons.message_outlined),onTap: ()async{
+                      final FirebaseAuth _auth = FirebaseAuth.instance;
+                      var ref = FirebaseFirestore.instance.collection('Conversations');
+                      if(userId==currentUserId){
+                        Fluttertoast.showToast(msg: "Kendinize mesaj gönderemezsiniz!"); //TODO DELETE IT LATER
+                      }
+                      else{
+                        var documentRef = await ref.add(
+                            {
+                              'displayMessage':'',
+                              'members':[userId,_auth.currentUser?.uid],
+                              'name_surname':name_surname,
+                              'name_surname2':name_surname_current,
+                              'start_location':start_location,
+                              'end_location':end_location,
+                            }
+                        );//CONVERSATION OLUSTURULDU
+
+                        //ŞİMDİ DE DİREKT SAYFAYA GİDİLİYOR.
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationPage(
+                          userId: userId,
+                          conversationId: documentRef.id,
+                        )));
+                      }
+
+                      /* PHONE CALL FEATURE does not need anymore
                       String phoneNumber= await getPhoneNumber(userId);
                       _makePhoneCall(phoneNumber);
+                       */
+
                     },),
                   ],
                 ),

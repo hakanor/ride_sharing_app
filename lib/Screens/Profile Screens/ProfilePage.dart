@@ -164,7 +164,7 @@ class _ProfilePageState  extends State<ProfilePage> {
                                     child: Container(
                                       width:30,
                                       height: 30,
-                                      child: Icon(Icons.camera_alt_outlined,color: Colors.black87,),
+                                      child: Icon(Icons.camera_alt_rounded,color: Colors.white,size: 20 ,),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(20),
                                         color: Colors.blue,

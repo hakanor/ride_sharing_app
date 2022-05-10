@@ -20,15 +20,15 @@ class _MainPageState extends State<MainPage> {
   AuthService _authService = AuthService();
   final List<Widget> _children=[
     HomePage(),
-    test_screen(),
     MyListingsPage(),
+    test_screen(),
     MainChatPage(),
     ProfilePage(),
   ];
   int _currentIndex=0;
 
   onTabTapped(int index){
-    if(index==1){
+    if(index==2){
       Navigator.push(context, MaterialPageRoute(builder: (context) => test_screen()));
     }
     else{
@@ -54,13 +54,14 @@ class _MainPageState extends State<MainPage> {
             icon: Icon(Icons.explore),
             label: "Tüm İlanlar",
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle),
-            label: "Ekle",
-          ),
+
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment),
             label: "İlanlarım",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle),
+            label: "Ekle",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.message),

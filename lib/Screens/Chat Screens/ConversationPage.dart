@@ -106,7 +106,9 @@ class _ConversationPageState extends State<ConversationPage> {
                     _focusNode.unfocus();
                   },
                   child: StreamBuilder(
-                    stream: _ref.orderBy('time',descending: true).orderBy('date',descending: true).snapshots(),
+                    //TODO ORDER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! timeFormat
+                    //stream: _ref.orderBy('time',descending: true).orderBy('date',descending: true).snapshots(),
+                      stream: _ref.orderBy('timeStamp',descending: true).snapshots(),
                     builder: (context, AsyncSnapshot <QuerySnapshot> snapshot) {
                       return !snapshot.hasData
                           ? Center(
@@ -125,17 +127,25 @@ class _ConversationPageState extends State<ConversationPage> {
                                     Container(
                                       padding: EdgeInsets.only(bottom: 15,top: 8,right: 20,left: 8),
                                       decoration: BoxDecoration(
-                                          color: Theme.of(context).primaryColor,
-                                          borderRadius: BorderRadius.horizontal(
-                                            left: Radius.circular(10),
-                                            right: Radius.circular(10),
-                                          )
+                                          color: widget.userId != document['senderId']
+                                              ?Colors.blueGrey
+                                              :Colors.blue,
+                                          borderRadius: BorderRadius.only(
+                                            topLeft:Radius.circular(13),
+                                            topRight:Radius.circular(13),
+                                            bottomLeft:widget.userId != document['senderId']
+                                                ?Radius.circular(0)
+                                                :Radius.circular(13),
+                                            bottomRight: widget.userId != document['senderId']
+                                                ?Radius.circular(13)
+                                                :Radius.circular(0),
+                                          ),
                                       ),
                                       child: Text(document['message'],style: TextStyle(color: Colors.white),),
 
                                     ),
                                     Positioned(bottom:0,right: 0,child: Padding(
-                                      padding: const EdgeInsets.only(right: 3,bottom: 3),
+                                      padding: const EdgeInsets.only(right: 6,bottom: 3),
                                       child: Text(document['time_formatted'],style: TextStyle(color: Colors.white,fontSize: 10),),
                                     )),
                                   ],
@@ -172,6 +182,7 @@ class _ConversationPageState extends State<ConversationPage> {
                           if(_editingController.text!=""){
                             var now = DateTime.now();
                             var formatter = new DateFormat('dd-MM-yyyy');
+                            //var formatter = new DateFormat('yyyy-MM-dd');
                             String formattedDate = formatter.format(now);
 
                             String _hour = now.hour.toString();

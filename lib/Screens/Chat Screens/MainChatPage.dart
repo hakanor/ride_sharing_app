@@ -17,6 +17,7 @@ class _MainChatPageState extends State<MainChatPage> {
 
   String userId="";
   late Future<String> _dataFuture;
+  late Future<String> _dataFuture2;
 
   Future<String> getNameSurname(String uid)async {
     String b="";
