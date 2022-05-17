@@ -9,6 +9,7 @@ import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/directions.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:ride_sharing_app/Screens/DetailedListingPage.dart';
 import 'package:ride_sharing_app/Services/auth_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'Chat Screens/ConversationPage.dart';
@@ -323,10 +324,16 @@ class _HomePageState extends State<HomePage> {
                         String price=data['price'];
                         String name_surname=data['name_surname'];
                         String userId=data['user_id'];
+
                         return GestureDetector(
                           onTap: () async {
                             //TIKLANILDIĞI ZAMAN İLAN DETAY SAYFASINA GİTMESİ İÇİN GESTURE
                             Fluttertoast.showToast(msg: document.id); //TODO DELETE IT LATER
+
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => DetailedListingPage(
+                              listingId: document.id,
+                            )));
+
                             },
                           child: buildTripCard(
                               context,
