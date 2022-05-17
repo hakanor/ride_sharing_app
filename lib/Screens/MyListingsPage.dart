@@ -3,7 +3,10 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ride_sharing_app/Screens/EditListingPage.dart';
+
+import 'DetailedListingPage.dart';
 
 class MyListingsPage extends StatefulWidget {
   const MyListingsPage({Key? key}) : super(key: key);
@@ -19,6 +22,26 @@ class _PersonalAdsState extends State<MyListingsPage> {
   where("user_id",isEqualTo: FirebaseAuth.instance.currentUser?.uid).
   orderBy("date",descending: true).
   orderBy("time").snapshots();
+
+  List<LatLng> setLocations(String coords){
+    final splitted = coords.split('/');
+    List <LatLng> list=[];
+    for(int i=0;i<splitted.length-1;i++){
+      if(i==0){
+        final splitted2=splitted[i].split('-');
+        print(splitted2[0]);
+        LatLng place=new LatLng(double.parse(splitted2[0]),double.parse(splitted2[1]));
+        list.add(place);
+      }
+      if(i==splitted.length-2){
+        final splitted2=splitted[i].split('-');
+        print(splitted2[0]);
+        LatLng place2=new LatLng(double.parse(splitted2[0]),double.parse(splitted2[1]));
+        list.add(place2);
+      }
+    }
+    return list;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,10 +125,14 @@ class _PersonalAdsState extends State<MyListingsPage> {
                           String price=data['price'];
                           String userId=data['user_id'];
                           String doc_id=document.id;
+                          String coords=data['coord'];
                           return GestureDetector(
                             onTap: (){
                               //TIKLANILDIĞI ZAMAN İLAN DETAY SAYFASINA GİTMESİ İÇİN GESTURE
-                              Fluttertoast.showToast(msg: document.id);
+                              List<LatLng>list=setLocations(coords);
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => DetailedListingPage(
+                                listingId: document.id, coords:coords, list:list,
+                              )));
                             },
                             child: buildTripCard(
                               context,
