@@ -388,34 +388,127 @@ Widget buildListingCard(
                 //Spacer(),
               ]),
             ),
-            /*
-            buildCardTile(
-                desc: "Tarih Bilgileri",
-                text: snapshot.data!['time'],
-                text2:snapshot.data!['date'],
-                onPress: (){},
-                icon: Icons.alarm,
-                icon2: Icons.calendar_month),
-            buildCardTile(
-                desc: "Araç Bilgileri",
-                text: snapshot.data!['car_brand']+" "+snapshot.data!['car_model']+" marka model araç.",
-                text2: snapshot.data!['platenumber']+" plakalı araç.",
-                onPress: (){},
-                icon: Icons.directions_car,
-                icon2: Icons.directions_car),
-            buildCardTile(
-                desc: "Yolculuk Bilgileri",
-                text: snapshot.data!['seat_count'].toString()+" adet boş koltuk.",
-                text2:snapshot.data!['price']+" TL",
-                onPress: (){},
-                icon: Icons.airline_seat_recline_normal,
-                icon2: Icons.currency_bitcoin),
-*/
+
+            Padding(
+              padding: const EdgeInsets.only(top:20,),
+              child: Row(children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(left:4.0),
+                  child: Text("Sürücü Bilgileri",
+                    style: new TextStyle(
+                      fontSize: 16.0,
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                //Spacer(),
+              ]),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4.0,top: 8),
+              child: Row(children: <Widget>[
+                Container(
+                  child: FutureBuilder<String>(
+                    future: getData(snapshot.data!['user_id'],"Image"), // async work
+                    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.waiting: return CircularProgressIndicator();
+                        default:
+                          if (snapshot.hasError)
+                            return Text('Error: ${snapshot.error}');
+                          else{
+                            String? url=snapshot.data;
+                            return Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.blue,width: 1),
+                                  borderRadius: BorderRadius.circular(100),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: Colors.grey.withOpacity(.55),
+                                        blurRadius: 10,
+                                        spreadRadius: 2)
+                                  ],
+                                ),
+                                child: CircleAvatar(
+                                  backgroundImage:
+                                  NetworkImage(url!),
+                                ),
+                              ),
+                            );
+                          }
+                      }
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left:8.0),
+                  child:  FutureBuilder<String>(
+                    future: getData(snapshot.data!['user_id'],"name"), // async work
+                    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.waiting: return CircularProgressIndicator();
+                        default:
+                          if (snapshot.hasError)
+                            return Text('Error: ${snapshot.error}');
+                          else{
+                            String? data=snapshot.data;
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(data!,style: new TextStyle(fontSize: 17.0),),
+                              ],
+                            );
+                          }
+                      }
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left:8.0),
+                  child:  FutureBuilder<String>(
+                    future: getData(snapshot.data!['user_id'],"surname"), // async work
+                    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.waiting: return CircularProgressIndicator();
+                        default:
+                          if (snapshot.hasError)
+                            return Text('Error: ${snapshot.error}');
+                          else{
+                            String? data=snapshot.data;
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(data!,style: new TextStyle(fontSize: 17.0),),
+                              ],
+                            );
+                          }
+                      }
+                    },
+                  ),
+                ),
+              ]),
+            ),
+
           ],
         ),
       ),
     ),
   );
+}
+
+Future<String> getData(String id,String keyword) async {
+  String b="";
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(id)
+      .get().then((value) {
+    b=value.data()![keyword];
+  });
+  return b;
 }
 
 Widget buildCardTile(
