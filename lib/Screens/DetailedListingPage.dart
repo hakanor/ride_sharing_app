@@ -5,32 +5,22 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class Listing{
-  String car_brand="";
-  String car_model="";
-  String date="";
-  String time="";
-  String plate_number="";
-  String price="";
-  String seat_count="";
-  String start_location="";
-  String end_location="";
-  String user_id="";
-}
-
 class DetailedListingPage extends StatefulWidget {
   final String listingId;
-  const DetailedListingPage({Key? key, required this.listingId}) : super(key: key);
+  final String coords;
+  final List<LatLng> list;
+  const DetailedListingPage({Key? key, required this.listingId, required this.coords,required this.list}) : super(key: key);
 
   @override
   _DetailedListingPageState createState() => _DetailedListingPageState();
 }
 
-class _DetailedListingPageState extends State<DetailedListingPage> {
-  Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance.
-  collection('Listings').snapshots();
 
-  Listing listing=new Listing();
+
+class _DetailedListingPageState extends State<DetailedListingPage> {
+  CollectionReference usersCollection =
+  FirebaseFirestore.instance.collection('Listings');
+
   String listingId="";
   String? googleApikey=dotenv.env['GOOGLE_API_KEY'];
   GoogleMapController? mapController; //controller for Google map
@@ -49,29 +39,41 @@ class _DetailedListingPageState extends State<DetailedListingPage> {
   @override
   void initState() {
     listingId=widget.listingId;
+    setState(() {
+      place1=widget.list[0];
+      place2=widget.list[1];
+      setMarker(place1);
+      setMarker(place2);
+      print(widget.list.length);
+      print(place1);
+    });
+    setPolylines();
     super.initState();
   }
 
-  Future <Listing> getListing(String listingId)async{
-    FirebaseFirestore.instance
-        .collection('Listings')
-        .doc(listingId)
-        .get().then((value) {
-      listing.car_brand=value.data()!['car_brand'];
-      listing.car_model=value.data()!['car_model'];
-      listing.date=value.data()!['date'];
-      listing.time=value.data()!['time'];
-      listing.plate_number=value.data()!['plate_number'];
-      listing.price=value.data()!['price'];
-      listing.seat_count=value.data()!['seat_count'].toString();
-      listing.start_location=value.data()!['start_location'];
-      listing.end_location=value.data()!['end_location'];
-      listing.user_id=value.data()!['user_id'];
-    });
-    return listing;
+  void setLocations()async{
+    final splitted = widget.coords.split('/');
+    for(int i=0;i<splitted.length-1;i++){
+      if(i==0){
+        final splitted2=splitted[i].split('-');
+        print(splitted2[0]);
+        LatLng place=new LatLng(double.parse(splitted2[0]),double.parse(splitted2[1]));
+        setState(() {
+          place1=place;
+        });
+
+      }
+      if(i==splitted.length-1){
+        final splitted2=splitted[i].split('-');
+        print(splitted2[0]);
+        LatLng place=new LatLng(double.parse(splitted2[0]),double.parse(splitted2[1]));
+        setState(() {
+          place2=place;
+        });
+      }
+      setPolylines();
+    }
   }
-
-
 
   void setMarker(LatLng point){
     setState(() {
@@ -121,9 +123,6 @@ class _DetailedListingPageState extends State<DetailedListingPage> {
               expandedHeight: 300,
               pinned: true,
               floating:false,
-              leading: ElevatedButton(onPressed: (){
-
-              },child: Text("test2"),),
               flexibleSpace: FlexibleSpaceBar(
                 centerTitle: true,
                 title: Text(widget.listingId),
@@ -135,7 +134,7 @@ class _DetailedListingPageState extends State<DetailedListingPage> {
                       markers: markers,
                       polylines: _polylines,
                       initialCameraPosition: CameraPosition( //innital position in map
-                        target: startLocation, //initial position
+                        target: place1, //initial position
                         zoom: 14.0, //initial zoom level
                       ),
                       mapType: MapType.normal, //map type
@@ -150,7 +149,20 @@ class _DetailedListingPageState extends State<DetailedListingPage> {
 
             ),
             SliverToBoxAdapter(
-              child: buildListingCard(context, listingId: widget.listingId),
+              child: StreamBuilder<DocumentSnapshot>(
+                stream: usersCollection.doc(widget.listingId).snapshots(),
+                builder: (ctx, streamSnapshot) {
+                  if (streamSnapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.blue,
+                      ),
+                    );
+                  }
+
+                  return buildListingCard(context, listingId: listingId, snapshot: streamSnapshot);
+                },
+              ),
             )
           ],
         ),
@@ -164,6 +176,7 @@ Widget buildListingCard(
     BuildContext context,
     {
       required String listingId,
+      required AsyncSnapshot snapshot,
 
     } ) {
   return Container(
@@ -179,21 +192,7 @@ Widget buildListingCard(
                 Icon(Icons.radio_button_checked,color: Colors.blue,),
                 Padding(
                   padding: const EdgeInsets.only(left:4.0),
-                  child: FutureBuilder<String>(
-                    future: getKeyword(listingId,"car_brand"), // async work
-                    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.waiting: return CircularProgressIndicator();
-                        default:
-                          if (snapshot.hasError)
-                            return Text('Error: ${snapshot.error}');
-                          else{
-                            String? name_surname_from_users=snapshot.data;
-                            return Text(name_surname_from_users!);
-                          }
-                      }
-                    },
-                  ),
+                  child: Text(snapshot.data!['start_location'], style: new TextStyle(fontSize: 17.0),),
                 ),
                 //Spacer(),
               ]),
@@ -235,7 +234,7 @@ Widget buildListingCard(
                 const Icon(Icons.location_on,color: Colors.red,),
                 Padding(
                   padding: const EdgeInsets.only(left:4.0),
-                  child: Text("listing.end_location", style: new TextStyle(fontSize: 17.0),),
+                  child: Text(snapshot.data!['end_location'], style: new TextStyle(fontSize: 17.0),),
                 ),
                 //Spacer(),
               ]),
@@ -247,7 +246,7 @@ Widget buildListingCard(
                 const Icon(Icons.alarm,color: Colors.red,),
                 Padding(
                   padding: const EdgeInsets.only(left:4.0),
-                  child: Text("listing.time", style: new TextStyle(fontSize: 17.0),),
+                  child: Text(snapshot.data!['time'], style: new TextStyle(fontSize: 17.0),),
                 ),
                 //Spacer(),
               ]),
@@ -258,7 +257,7 @@ Widget buildListingCard(
                 const Icon(Icons.calendar_month,color: Colors.red,),
                 Padding(
                   padding: const EdgeInsets.only(left:4.0),
-                  child: Text("listing.date", style: new TextStyle(fontSize: 17.0),),
+                  child: Text(snapshot.data!['date'], style: new TextStyle(fontSize: 17.0),),
                 ),
                 //Spacer(),
               ]),
@@ -269,7 +268,7 @@ Widget buildListingCard(
                 const Icon(Icons.directions_car,color: Colors.red,),
                 Padding(
                   padding: const EdgeInsets.only(left:4.0),
-                  child: Text("listing.car_brand+" "+listing.car_model", style: new TextStyle(fontSize: 17.0),),
+                  child: Text(snapshot.data!['car_brand']+" "+snapshot.data!['car_model']+" marka model araç.", style: new TextStyle(fontSize: 17.0),),
                 ),
                 //Spacer(),
               ]),
@@ -280,7 +279,7 @@ Widget buildListingCard(
                 const Icon(Icons.directions_car,color: Colors.red,),
                 Padding(
                   padding: const EdgeInsets.only(left:4.0),
-                  child: Text("listing.plate_number", style: new TextStyle(fontSize: 17.0),),
+                  child: Text(snapshot.data!['platenumber']+" plakalı araç.", style: new TextStyle(fontSize: 17.0),),
                 ),
                 //Spacer(),
               ]),
@@ -291,7 +290,7 @@ Widget buildListingCard(
                 const Icon(Icons.airline_seat_recline_normal,color: Colors.red,),
                 Padding(
                   padding: const EdgeInsets.only(left:4.0),
-                  child: Text("listing.seat_count", style: new TextStyle(fontSize: 17.0),),
+                  child: Text(snapshot.data!['seat_count'].toString()+" adet boş koltuk.", style: new TextStyle(fontSize: 17.0),),
                 ),
                 //Spacer(),
               ]),
@@ -306,7 +305,7 @@ Widget buildListingCard(
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left:8.0),
-                  child: Text("listing.price", style: new TextStyle(fontSize: 17.0),),
+                  child: Text(snapshot.data!['price']+" TL", style: new TextStyle(fontSize: 17.0),),
                 ),
                 //Spacer(),
               ]),
@@ -317,16 +316,4 @@ Widget buildListingCard(
       ),
     ),
   );
-}
-
-Future <String> getKeyword(String listingId,String keyword)async{
-  String variable="";
-  FirebaseFirestore.instance
-      .collection('Listings')
-      .doc(listingId)
-      .get().then((value) {
-    variable=value.data()![keyword];
-    print(variable);
-  });
-  return variable;
 }

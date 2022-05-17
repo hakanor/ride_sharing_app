@@ -66,6 +66,26 @@ class _HomePageState extends State<HomePage> {
     return b;
   }
 
+  List<LatLng> setLocations(String coords){
+    final splitted = coords.split('/');
+    List <LatLng> list=[];
+    for(int i=0;i<splitted.length-1;i++){
+      if(i==0){
+        final splitted2=splitted[i].split('-');
+        print(splitted2[0]);
+        LatLng place=new LatLng(double.parse(splitted2[0]),double.parse(splitted2[1]));
+        list.add(place);
+      }
+      if(i==splitted.length-2){
+        final splitted2=splitted[i].split('-');
+        print(splitted2[0]);
+        LatLng place2=new LatLng(double.parse(splitted2[0]),double.parse(splitted2[1]));
+        list.add(place2);
+      }
+    }
+    return list;
+  }
+
 
   @override
   void initState() {
@@ -324,14 +344,15 @@ class _HomePageState extends State<HomePage> {
                         String price=data['price'];
                         String name_surname=data['name_surname'];
                         String userId=data['user_id'];
+                        String coords=data['coord'];
 
                         return GestureDetector(
                           onTap: () async {
                             //TIKLANILDIĞI ZAMAN İLAN DETAY SAYFASINA GİTMESİ İÇİN GESTURE
-                            Fluttertoast.showToast(msg: document.id); //TODO DELETE IT LATER
-
+                            // TODO DELETE IT LATER
+                            List<LatLng>list=setLocations(coords);
                             Navigator.push(context, MaterialPageRoute(builder: (context) => DetailedListingPage(
-                              listingId: document.id,
+                              listingId: document.id, coords:coords, list:list,
                             )));
 
                             },
