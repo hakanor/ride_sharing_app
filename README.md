@@ -22,6 +22,6 @@ Map methods were coded with Flutter and Google Maps API.
 Places API is used for autocomplete in address search.
 Firebase is used for storage, realtime database.
 
-## ScreenShots
+## Screenshots
 ![image](https://user-images.githubusercontent.com/52280308/168922340-2bcb609d-b70b-4ec1-9de3-236d2d1a2330.png)
 ![image](https://user-images.githubusercontent.com/52280308/168922634-0fcf1802-de7e-4256-885a-be90b39f600b.png)
