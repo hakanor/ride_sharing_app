@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_line/dotted_line.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -46,33 +48,38 @@ class _DetailedListingPageState extends State<DetailedListingPage> {
       setMarker(place2);
       print(widget.list.length);
       print(place1);
+      setLocations();
     });
-    setPolylines();
+    //setPolylines();
     super.initState();
   }
 
   void setLocations()async{
     final splitted = widget.coords.split('/');
     for(int i=0;i<splitted.length-1;i++){
+      final splitted2=splitted[i].split('-');
+      print(splitted2[0]);
+      LatLng place=new LatLng(double.parse(splitted2[0]),double.parse(splitted2[1]));
+      setState(() {
+        polylineCoordinates.add(place);
+      });
       if(i==0){
-        final splitted2=splitted[i].split('-');
-        print(splitted2[0]);
-        LatLng place=new LatLng(double.parse(splitted2[0]),double.parse(splitted2[1]));
-        setState(() {
           place1=place;
-        });
-
       }
       if(i==splitted.length-1){
-        final splitted2=splitted[i].split('-');
-        print(splitted2[0]);
-        LatLng place=new LatLng(double.parse(splitted2[0]),double.parse(splitted2[1]));
-        setState(() {
           place2=place;
-        });
       }
-      setPolylines();
     }
+    setState(() {
+      _polylines.add(
+          Polyline(
+            width: 6,
+            polylineId: PolylineId('polyLine'),
+            color: Color(0xFF08A5CB),
+            points: polylineCoordinates,
+          )
+      );
+    });
   }
 
   void setMarker(LatLng point){
@@ -85,7 +92,7 @@ class _DetailedListingPageState extends State<DetailedListingPage> {
       );
     });
   }
-
+  /* NO NEED THIS FUNC. ANYMORE
   void setPolylines() async{
     _polylines.clear();
     polylineCoordinates.clear();
@@ -110,7 +117,7 @@ class _DetailedListingPageState extends State<DetailedListingPage> {
           )
       );
     });
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -123,14 +130,30 @@ class _DetailedListingPageState extends State<DetailedListingPage> {
               expandedHeight: 300,
               pinned: true,
               floating:false,
+              leading: GestureDetector(
+                  child: Icon(Icons.arrow_back_ios_outlined,color: Colors.black,),
+                onTap: (){
+                    Navigator.pop(context);
+                },
+              ),
+
+              title: Text("İlan Detayları",style: TextStyle(color: Colors.black87),),
               flexibleSpace: FlexibleSpaceBar(
                 centerTitle: true,
-                title: Text(widget.listingId),
+                //title: Text(widget.listingId),
                   background: Container(
                     height: 200,
                     width: MediaQuery.of(context).size.width,
                     child: GoogleMap( //Map widget from google_maps_flutter package
                       zoomGesturesEnabled: true,
+                      rotateGesturesEnabled: false,
+                      scrollGesturesEnabled: true,
+                      gestureRecognizers: Set()
+                        ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
+                        ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()))
+                        ..add(Factory<TapGestureRecognizer>(() => TapGestureRecognizer()))
+                        ..add(Factory<VerticalDragGestureRecognizer>(
+                                () => VerticalDragGestureRecognizer())),
                       markers: markers,
                       polylines: _polylines,
                       initialCameraPosition: CameraPosition( //innital position in map
@@ -159,7 +182,6 @@ class _DetailedListingPageState extends State<DetailedListingPage> {
                       ),
                     );
                   }
-
                   return buildListingCard(context, listingId: listingId, snapshot: streamSnapshot);
                 },
               ),
@@ -182,6 +204,7 @@ Widget buildListingCard(
   return Container(
     height: 615,
     child: Card(
+      color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.only(top:16.0,right: 16,left: 16,bottom: 16),
         child: Column(
@@ -202,6 +225,7 @@ Widget buildListingCard(
             Padding(
               padding: const EdgeInsets.only(left:10),
               child:Row(children: [
+
                 Container(
                   height: 30,
                   child: const DottedLine(
@@ -241,6 +265,24 @@ Widget buildListingCard(
             ),
 
             Padding(
+              padding: const EdgeInsets.only(top:20,),
+              child: Row(children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(left:4.0),
+                  child: Text("Tarih Bilgileri",
+                    style: new TextStyle(
+                        color: Colors.black87,
+                        fontSize: 16.0,
+                        decoration: TextDecoration.underline,
+                        fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                //Spacer(),
+              ]),
+            ),
+
+            Padding(
               padding: const EdgeInsets.only(bottom: 4.0,top: 8),
               child: Row(children: <Widget>[
                 const Icon(Icons.alarm,color: Colors.red,),
@@ -262,6 +304,24 @@ Widget buildListingCard(
                 //Spacer(),
               ]),
             ),
+
+            Padding(
+              padding: const EdgeInsets.only(top:20,),
+              child: Row(children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(left:4.0),
+                  child: Text("Araç Bilgileri",
+                    style: new TextStyle(
+                      fontSize: 16.0,
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                //Spacer(),
+              ]),
+            ),
+
             Padding(
               padding: const EdgeInsets.only(bottom: 4.0,top: 8),
               child: Row(children: <Widget>[
@@ -284,6 +344,24 @@ Widget buildListingCard(
                 //Spacer(),
               ]),
             ),
+
+            Padding(
+              padding: const EdgeInsets.only(top:20,),
+              child: Row(children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(left:4.0),
+                  child: Text("Yolculuk Bilgileri",
+                    style: new TextStyle(
+                      fontSize: 16.0,
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                //Spacer(),
+              ]),
+            ),
+
             Padding(
               padding: const EdgeInsets.only(bottom: 4.0,top: 8),
               child: Row(children: <Widget>[
@@ -305,14 +383,116 @@ Widget buildListingCard(
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left:8.0),
-                  child: Text(snapshot.data!['price']+" TL", style: new TextStyle(fontSize: 17.0),),
+                  child: Text(snapshot.data!['price']+" TL kişi başı ücret.", style: new TextStyle(fontSize: 17.0),),
                 ),
                 //Spacer(),
               ]),
             ),
-
+            /*
+            buildCardTile(
+                desc: "Tarih Bilgileri",
+                text: snapshot.data!['time'],
+                text2:snapshot.data!['date'],
+                onPress: (){},
+                icon: Icons.alarm,
+                icon2: Icons.calendar_month),
+            buildCardTile(
+                desc: "Araç Bilgileri",
+                text: snapshot.data!['car_brand']+" "+snapshot.data!['car_model']+" marka model araç.",
+                text2: snapshot.data!['platenumber']+" plakalı araç.",
+                onPress: (){},
+                icon: Icons.directions_car,
+                icon2: Icons.directions_car),
+            buildCardTile(
+                desc: "Yolculuk Bilgileri",
+                text: snapshot.data!['seat_count'].toString()+" adet boş koltuk.",
+                text2:snapshot.data!['price']+" TL",
+                onPress: (){},
+                icon: Icons.airline_seat_recline_normal,
+                icon2: Icons.currency_bitcoin),
+*/
           ],
         ),
+      ),
+    ),
+  );
+}
+
+Widget buildCardTile(
+    {
+      required String desc,
+      required String text,
+      required String text2,
+      required Function onPress,
+      required IconData icon,
+      required IconData icon2,
+    }) {
+  return Padding(
+    padding: const EdgeInsets.only(top:8.0),
+    child: Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.black87,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6,left: 4),
+            child: Text(
+              desc,
+              style: TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.w400,
+                fontSize: 15,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top:3.0,left: 4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 18,
+                  color: Colors.blue,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left :8.0),
+                  child: Text(
+                    text,
+                    style: TextStyle(color: Colors.white,fontWeight: FontWeight.w400,fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top:7.0,left :4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  icon2,
+                  size: 18,
+                  color: Colors.blue,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left :8.0),
+                  child: Text(
+                    text2,
+                    style: TextStyle(color: Colors.white,fontWeight: FontWeight.w400,fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     ),
   );
