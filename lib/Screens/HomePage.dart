@@ -48,28 +48,13 @@ class _HomePageState extends State<HomePage> {
 
    Future <String> getData2(List<String> members, String start_location) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Conversations').get();
-    // Get data from docs and convert map to List
-    //final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
-    //for a specific field
     final allData =
     querySnapshot.docs.map((doc) => doc.get('members')).toList();
     final allData2 =
     querySnapshot.docs.map((doc) => doc.get('start_location')).toList();
     final allData3 =
     querySnapshot.docs.map((doc) => doc.id).toList();
-/*
-    for(int i=0;i<allData.length;i++){
-      if(allData[i][0]==members[0]&& allData[i][1]==members[1]){
-        print(allData[i]);
-        print(allData[i].runtimeType);
-        print(members);
-        print(members.runtimeType);
-        print("tss");
-        print(allData2[0]);
-        print(allData2.length);
-      }
-    }
-*/
+
     for(int i=0;i<allData.length;i++){
       if(allData[i][0]==members[0]&& allData[i][1]==members[1]){
         if(allData2[i]==start_location){

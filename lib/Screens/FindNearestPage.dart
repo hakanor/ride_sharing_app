@@ -56,6 +56,26 @@ class _FindNearestPageState extends State<FindNearestPage> {
     super.initState();
   }
 
+  Future <String> getData2(List<String> members, String start_location) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Conversations').get();
+
+    final allData =
+    querySnapshot.docs.map((doc) => doc.get('members')).toList();
+    final allData2 =
+    querySnapshot.docs.map((doc) => doc.get('start_location')).toList();
+    final allData3 =
+    querySnapshot.docs.map((doc) => doc.id).toList();
+
+    for(int i=0;i<allData.length;i++){
+      if(allData[i][0]==members[0]&& allData[i][1]==members[1]){
+        if(allData2[i]==start_location){
+          return allData3[i].toString();
+        }
+      }
+    }
+    return "true";
+  }
+
   //GET CURRENT LOCATION
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
@@ -564,7 +584,14 @@ class _FindNearestPageState extends State<FindNearestPage> {
                     GestureDetector(child: Icon(Icons.message_outlined),onTap: ()async{
                       final FirebaseAuth _auth = FirebaseAuth.instance;
                       var ref = FirebaseFirestore.instance.collection('Conversations');
-                      if(userId==currentUserId){
+                      var checker= await getData2([userId,_auth.currentUser!.uid],start_location);
+                      if(checker!="true"){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationPage(
+                          userId: userId,
+                          conversationId: checker,
+                        )));
+                      }
+                      else if(userId==currentUserId){
                         Fluttertoast.showToast(msg: "Kendinize mesaj gönderemezsiniz!"); //TODO DELETE IT LATER
                       }
                       else{
