@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -42,6 +44,40 @@ class _HomePageState extends State<HomePage> {
         .get().then((value) {
       name_surname_current=value.data()!['name']+" "+value.data()!['surname'];
     });
+  }
+
+   Future <String> getData2(List<String> members, String start_location) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Conversations').get();
+    // Get data from docs and convert map to List
+    //final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+    //for a specific field
+    final allData =
+    querySnapshot.docs.map((doc) => doc.get('members')).toList();
+    final allData2 =
+    querySnapshot.docs.map((doc) => doc.get('start_location')).toList();
+    final allData3 =
+    querySnapshot.docs.map((doc) => doc.id).toList();
+/*
+    for(int i=0;i<allData.length;i++){
+      if(allData[i][0]==members[0]&& allData[i][1]==members[1]){
+        print(allData[i]);
+        print(allData[i].runtimeType);
+        print(members);
+        print(members.runtimeType);
+        print("tss");
+        print(allData2[0]);
+        print(allData2.length);
+      }
+    }
+*/
+    for(int i=0;i<allData.length;i++){
+      if(allData[i][0]==members[0]&& allData[i][1]==members[1]){
+        if(allData2[i]==start_location){
+          return allData3[i].toString();
+        }
+      }
+    }
+    return "true";
   }
 
   Future<String> getImageUrl(String uid)async {
@@ -545,7 +581,14 @@ class _HomePageState extends State<HomePage> {
                     GestureDetector(child: Icon(Icons.message_outlined),onTap: ()async{
                       final FirebaseAuth _auth = FirebaseAuth.instance;
                       var ref = FirebaseFirestore.instance.collection('Conversations');
-                      if(userId==currentUserId){
+                      var checker= await getData2([userId,_auth.currentUser!.uid],start_location);
+                      if(checker!="true"){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationPage(
+                          userId: userId,
+                          conversationId: checker,
+                        )));
+                      }
+                      else if(userId==currentUserId){
                         Fluttertoast.showToast(msg: "Kendinize mesaj gönderemezsiniz!"); //TODO DELETE IT LATER
                       }
                       else{
