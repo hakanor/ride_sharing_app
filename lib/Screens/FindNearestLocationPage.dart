@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:ride_sharing_app/Screens/FindNearestLocationPage.dart';
-import 'package:url_launcher/url_launcher.dart';
+
 import 'Chat Screens/ConversationPage.dart';
 import 'DetailedListingPage.dart';
 
@@ -25,71 +24,31 @@ class Listing{
   late String coord;
   late double minresult;
 }
-
-class FindNearestPage extends StatefulWidget {
-
+class FindNearestLocationPage extends StatefulWidget {
   LatLng place_latlng;
+  LatLng location_latlng;
   final String placename;
-  FindNearestPage({required this.place_latlng, required this.placename,});
+  FindNearestLocationPage({required this.place_latlng, required this.placename,required this.location_latlng});
 
   @override
-  _FindNearestPageState createState() => _FindNearestPageState();
+  _FindNearestLocationPageState createState() => _FindNearestLocationPageState();
 }
 
-class _FindNearestPageState extends State<FindNearestPage> {
+class _FindNearestLocationPageState extends State<FindNearestLocationPage> {
 
-  var lat="";
-  var lon="";
   String currentUserId="";
   String name_surname_current="";
 
   TextEditingController controller = TextEditingController();
   Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance.
-  collection('Listings').orderBy("date",descending: true).
-  orderBy("time").snapshots();
+  collection('Listings').snapshots();
 
   @override
   void initState() {
     // TODO: implement initState
-    lat=widget.place_latlng.latitude.toString();
-    lon=widget.place_latlng.longitude.toString();
     super.initState();
   }
 
-  //GET CURRENT LOCATION
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-    return await Geolocator.getCurrentPosition();
-  }
-
-  // FUNC FOR UPDATE CURRENT POSITION
-  Future <void> updatePosition() async {
-    Position position = await _determinePosition();
-    lat=position.latitude.toString();
-    lon=position.longitude.toString();
-  }
-
-  // FUNC FOR NAVIGATOR--> COORDS
   List<LatLng> setLocations(String coords){
     final splitted = coords.split('/');
     List <LatLng> list=[];
@@ -110,6 +69,37 @@ class _FindNearestPageState extends State<FindNearestPage> {
     return list;
   }
 
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    return await Geolocator.getCurrentPosition();
+  }
+
+  Future <void> updatePosition() async {
+    Position position = await _determinePosition();
+  }
+
+
 
   double calculateDistance(lat1, lon1, lat2, lon2){
     var p = 0.017453292519943295;
@@ -118,15 +108,6 @@ class _FindNearestPageState extends State<FindNearestPage> {
         c(lat1 * p) * c(lat2 * p) *
             (1 - c((lon2 - lon1) * p))/2;
     return 12742 * asin(sqrt(a));
-  }
-
-
-  Future<void> _makePhoneCall(String phoneNumber) async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
-    await launchUrl(launchUri);
   }
 
 
@@ -139,17 +120,6 @@ class _FindNearestPageState extends State<FindNearestPage> {
     });
   }
 
-  Future<String> getPhoneNumber (String userid) async {
-    String number="";
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(userid)
-        .get().then((value) {
-      number=value.data()!['number'];
-      print(number);
-    });
-    return number;
-  }
 
   Future<String> getImageUrl(String uid)async {
     String b="";
@@ -172,6 +142,7 @@ class _FindNearestPageState extends State<FindNearestPage> {
     });
     return b;
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -206,96 +177,35 @@ class _FindNearestPageState extends State<FindNearestPage> {
                         ),
                         Container(
                           child: Center(
-                            child: Text(
-                              "Yakın İlanlar",
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.blue.withOpacity(.75),
-                                  fontWeight: FontWeight.bold),
-                            ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  "Konumunuza Göre",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.blue.withOpacity(.75),
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  "Yakın İlanlar",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.blue.withOpacity(.75),
+                                      fontWeight: FontWeight.bold),
+                                ),
+
+                              ],
+                            )
                           ),
                         ),
                         Container(
                           width: ((size.width)-40)/3,
-                          child: ElevatedButton(child:Icon(Icons.run_circle),
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all(CircleBorder()),
-                              padding: MaterialStateProperty.all(EdgeInsets.all(3)),
-                              backgroundColor: MaterialStateProperty.all(Colors.blue), // <-- Button color
-                              overlayColor: MaterialStateProperty.resolveWith<Color?>((states) {
-                                if (states.contains(MaterialState.pressed)) return Colors.red; // <-- Splash color
-                              }),
-                            ),
-                          onPressed: ()async{
-                              setState(() {
-                                updatePosition();
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => FindNearestLocationPage(
-                                    place_latlng: widget.place_latlng,
-                                    placename: widget.placename,
-                                    location_latlng: LatLng(double.parse(lat), double.parse(lon)))));
-                              });
-                          },),
                         ),
 
                       ],
                     ),
                   ),
                 ),
-/*
-                Flexible(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: _usersStream,
-                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Error');
-                      }
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Text("Yükleniyor");
-                      }
-                      return ListView(
-                        children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                          Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-                          String start_location=data['start_location'];
-                          String end_location=data['end_location'];
-                          String date=data['date'];
-                          String time=data['time'];
-                          String price=data['price'];
-                          String name_surname=data['name_surname'];
-                          String userId=data['user_id'];
-
-                          String coord=data['coord'];
-                          var splitted=coord.split('/');
-                          for(int i=0; i<splitted.length-1; i++){
-                            String x = splitted[i];
-                            var splitted2=x.split('-');
-                            double result=calculateDistance(widget.place_latlng.latitude, widget.place_latlng.longitude, double.parse(splitted2[0]), double.parse(splitted2[1]));
-                            print(result);
-                            if(result<1 && start_location!= widget.placename){
-                              print("Bulundu!");
-                              return GestureDetector(
-                                onTap: (){
-                                  Fluttertoast.showToast(msg: document.id);
-                                },
-                                child: buildTripCard(
-                                  context,
-                                  start_location: start_location,
-                                  end_location: end_location,
-                                  date: date,
-                                  time: time,
-                                  price: price,
-                                  name_surname: name_surname,
-                                  userId: userId,
-                                ),
-                              );
-                            }
-                          }
-                          return Container();
-                        }).toList(),
-
-                      );
-                    },
-                  ),
-                )*/
 
                 Flexible(
                   child: StreamBuilder<QuerySnapshot>(
@@ -326,18 +236,20 @@ class _FindNearestPageState extends State<FindNearestPage> {
                             String x = splitted[i];
                             var splitted2=x.split('-');
                             double result=calculateDistance(widget.place_latlng.latitude, widget.place_latlng.longitude, double.parse(splitted2[0]), double.parse(splitted2[1]));
+                            double minresult=1;
 
                             if(result<1 && start_location!= widget.placename){
-                              double minresult=1;
-                              for(int i=0; i<splitted.length-1; i++){
-                                String x = splitted[i];
-                                var splitted2=x.split('-');
-                                print(double.parse(lat));
-                                print(double.parse(lon));
-                                double result=calculateDistance(widget.place_latlng.latitude, widget.place_latlng.longitude, double.parse(splitted2[0]), double.parse(splitted2[1]));
-                                print(result);
-                                if(result<minresult)
-                                  minresult=result;
+                              for(int j=0; j<1; j++){
+                                String y = splitted[j];
+                                var splitted2=y.split('-');
+                                double resultMin=calculateDistance(widget.location_latlng.latitude, widget.location_latlng.longitude, double.parse(splitted2[0]), double.parse(splitted2[1]));
+                                print("debug");
+                                print(double.parse(splitted2[0]));
+                                print(double.parse(splitted2[1]));
+                                print(widget.location_latlng.latitude);
+                                print(widget.location_latlng.longitude);
+
+                                minresult=resultMin;
                               }
                               Listing l1=new Listing();
                               l1.doc_id=doc_id;
@@ -356,14 +268,15 @@ class _FindNearestPageState extends State<FindNearestPage> {
                           return null;
                         }).toList();
 
-                        print(x);
                         for(int i=0;i<x.length;i++){
                           if(x[i]==null){
                             x.removeAt(i);
                             i--;
                           }
                         }
-                        //x.sort((a,b)=> a!.minresult.compareTo(b!.minresult));
+
+                        x.sort((a,b)=> a!.minresult.compareTo(b!.minresult));
+
                         return ListView.builder(
                             itemCount: x.length,
                             itemBuilder: (context,index){
@@ -378,6 +291,7 @@ class _FindNearestPageState extends State<FindNearestPage> {
                                   price: item.price,
                                   name_surname: item.name_surname,
                                   userId: item.userId,
+                                  minresult: item.minresult,
                                 ),
                                 onTap: (){
                                   //TODO TIKLANDILIĞI ZAMAN GİTMESİ İÇİN
@@ -389,6 +303,7 @@ class _FindNearestPageState extends State<FindNearestPage> {
                               );
                             }
                         );
+
                       }
                     },
                   ),
@@ -410,6 +325,7 @@ class _FindNearestPageState extends State<FindNearestPage> {
         required String price,
         required String name_surname,
         required String userId,
+        required double minresult,
 
       } ) {
 
@@ -428,6 +344,19 @@ class _FindNearestPageState extends State<FindNearestPage> {
                   Padding(
                     padding: const EdgeInsets.only(left:4.0),
                     child: Text(start_location, style: new TextStyle(fontSize: 17.0),),
+                  ),
+                  Spacer(),
+                  Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 4),
+                            child: Icon(Icons.run_circle_outlined,color: Colors.blue,),
+                          ),
+                          Text(minresult.toStringAsFixed(2)+" km", style: new TextStyle(fontSize: 16.0),)
+                        ],
+                      ),
                   ),
                   //Spacer(),
                 ]),
@@ -577,9 +506,9 @@ class _FindNearestPageState extends State<FindNearestPage> {
                               'start_location':start_location,
                               'end_location':end_location,
                             }
-                        );//CONVERSATION
+                        );//CONVERSATION OLUSTURULDU
 
-                        //ROUTE
+                        //ŞİMDİ DE DİREKT SAYFAYA GİDİLİYOR.
                         Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationPage(
                           userId: userId,
                           conversationId: documentRef.id,
@@ -595,5 +524,4 @@ class _FindNearestPageState extends State<FindNearestPage> {
       ),
     );
   }
-
 }

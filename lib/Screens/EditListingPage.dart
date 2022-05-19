@@ -305,11 +305,6 @@ class _EditListingPageState extends State<EditListingPage> {
                             Fluttertoast.showToast(msg: "Tüm alanların doldurulması gerekmektedir.");
                           }
                         }
-
-
-
-
-
                       },
                     ),
                   ),
