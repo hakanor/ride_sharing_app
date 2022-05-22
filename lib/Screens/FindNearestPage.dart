@@ -116,13 +116,11 @@ class _FindNearestPageState extends State<FindNearestPage> {
     for(int i=0;i<splitted.length-1;i++){
       if(i==0){
         final splitted2=splitted[i].split('-');
-        print(splitted2[0]);
         LatLng place=new LatLng(double.parse(splitted2[0]),double.parse(splitted2[1]));
         list.add(place);
       }
       if(i==splitted.length-2){
         final splitted2=splitted[i].split('-');
-        print(splitted2[0]);
         LatLng place2=new LatLng(double.parse(splitted2[0]),double.parse(splitted2[1]));
         list.add(place2);
       }
@@ -352,10 +350,7 @@ class _FindNearestPageState extends State<FindNearestPage> {
                               for(int i=0; i<splitted.length-1; i++){
                                 String x = splitted[i];
                                 var splitted2=x.split('-');
-                                print(double.parse(lat));
-                                print(double.parse(lon));
                                 double result=calculateDistance(widget.place_latlng.latitude, widget.place_latlng.longitude, double.parse(splitted2[0]), double.parse(splitted2[1]));
-                                print(result);
                                 if(result<minresult)
                                   minresult=result;
                               }
@@ -376,7 +371,6 @@ class _FindNearestPageState extends State<FindNearestPage> {
                           return null;
                         }).toList();
 
-                        print(x);
                         for(int i=0;i<x.length;i++){
                           if(x[i]==null){
                             x.removeAt(i);

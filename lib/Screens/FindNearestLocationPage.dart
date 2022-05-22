@@ -74,13 +74,11 @@ class _FindNearestLocationPageState extends State<FindNearestLocationPage> {
     for(int i=0;i<splitted.length-1;i++){
       if(i==0){
         final splitted2=splitted[i].split('-');
-        print(splitted2[0]);
         LatLng place=new LatLng(double.parse(splitted2[0]),double.parse(splitted2[1]));
         list.add(place);
       }
       if(i==splitted.length-2){
         final splitted2=splitted[i].split('-');
-        print(splitted2[0]);
         LatLng place2=new LatLng(double.parse(splitted2[0]),double.parse(splitted2[1]));
         list.add(place2);
       }
@@ -213,12 +211,31 @@ class _FindNearestLocationPageState extends State<FindNearestLocationPage> {
                                       fontWeight: FontWeight.bold),
                                 ),
 
+
                               ],
                             )
                           ),
                         ),
                         Container(
                           width: ((size.width)-40)/3,
+                          child: GestureDetector(
+                            onTap:(){
+                              AlertDialog alert = AlertDialog(
+                                title: Text("Km Hesabı Neye Göre Yapılıyor?"),
+                                content: Text("Bu sayfada gösterilen km verileri kuş uçuşu uzaklığı baz almaktadır."),
+                              );
+                              showDialog(
+                                  barrierDismissible: true,//tapping outside dialog will close the dialog if set 'true'
+                                  context: context,
+                                  builder: (context){
+                                    return alert;
+                                  }
+                              );
+                            },
+                              child: Container(
+                                  child: Icon(Icons.question_mark,color: Colors.blue,),
+                              )
+                          ),
                         ),
 
                       ],
@@ -262,12 +279,6 @@ class _FindNearestLocationPageState extends State<FindNearestLocationPage> {
                                 String y = splitted[j];
                                 var splitted2=y.split('-');
                                 double resultMin=calculateDistance(widget.location_latlng.latitude, widget.location_latlng.longitude, double.parse(splitted2[0]), double.parse(splitted2[1]));
-                                print("debug");
-                                print(double.parse(splitted2[0]));
-                                print(double.parse(splitted2[1]));
-                                print(widget.location_latlng.latitude);
-                                print(widget.location_latlng.longitude);
-
                                 minresult=resultMin;
                               }
                               Listing l1=new Listing();
@@ -364,20 +375,6 @@ class _FindNearestLocationPageState extends State<FindNearestLocationPage> {
                     padding: const EdgeInsets.only(left:4.0),
                     child: Text(start_location, style: new TextStyle(fontSize: 17.0),),
                   ),
-                  Spacer(),
-                  Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 4),
-                            child: Icon(Icons.run_circle_outlined,color: Colors.blue,),
-                          ),
-                          Text(minresult.toStringAsFixed(2)+" km", style: new TextStyle(fontSize: 16.0),)
-                        ],
-                      ),
-                  ),
-                  //Spacer(),
                 ]),
               ),
 
@@ -435,6 +432,15 @@ class _FindNearestLocationPageState extends State<FindNearestLocationPage> {
                     padding: const EdgeInsets.only(left: 4,top: 4),
                     child: Align(alignment: Alignment.topLeft,child: Text("Tarih : $date",style: TextStyle(fontSize: 15),)),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4.0,top:4),
+                    child: Row(
+                      children: [
+                        Text("Uzaklık : "),
+                        Text(minresult.toStringAsFixed(2)+" km", style: new TextStyle(fontSize: 16.0,color:(minresult < 2 ? Colors.blue : Colors.red)),)
+                      ],
+                    ),
+                  ),
                 ]),
               ),
 
@@ -450,6 +456,7 @@ class _FindNearestLocationPageState extends State<FindNearestLocationPage> {
                     Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Text("$price TL ", style: new TextStyle(fontSize: 22.0),)),
+
                     Spacer(),
 
                     FutureBuilder<String>(
