@@ -520,14 +520,18 @@ class _FindNearestLocationPageState extends State<FindNearestLocationPage> {
                       final FirebaseAuth _auth = FirebaseAuth.instance;
                       var ref = FirebaseFirestore.instance.collection('Conversations');
                       var checker= await getData2([userId,_auth.currentUser!.uid],start_location);
+                      print(checker);
+
                       if(checker!="true"){
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationPage(
-                          userId: userId,
-                          conversationId: checker,
-                        )));
-                      }
-                      else if(userId==currentUserId){
-                        Fluttertoast.showToast(msg: "Kendinize mesaj gönderemezsiniz!"); //TODO DELETE IT LATER
+                        if(userId==_auth.currentUser!.uid){
+                          Fluttertoast.showToast(msg: "Kendinize mesaj gönderemezsiniz!"); //TODO DELETE IT LATER
+                        }
+                        else{
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationPage(
+                            userId: userId,
+                            conversationId: checker,
+                          )));
+                        }
                       }
                       else{
                         var documentRef = await ref.add(
