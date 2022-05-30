@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -37,12 +35,35 @@ class _HomePageState extends State<HomePage> {
   String name_surname_current="";
   String currentUserId="";
 
+  String dropdownvalue = 'Şehir seçiniz';
+  var items = [
+    "Şehir seçiniz","Adana","Adıyaman","Afyon","Ağrı","Amasya","Ankara","Antalya","Artvin","Aydın","Balıkesir","Bilecik","Bingöl","Bitlis","Bolu","Burdur","Bursa","Çanakkale","Çankırı","Çorum",
+    "Denizli","Diyarbakır", "Edirne","Elazığ","Erzincan","Erzurum","Eskişehir","Gaziantep","Giresun","Gümüşhane","Hakkari","Hatay","Isparta","Mersin","İstanbul","İzmir","Kars",
+    "Kastamonu","Kayseri","Kırklareli","Kırşehir","Kocaeli","Konya","Kütahya","Malatya","Manisa","Kahramanmaraş","Mardin","Muğla","Muş","Nevşehir","Niğde","Ordu","Rize","Sakarya",
+    "Samsun","Siirt","Sinop","Sivas","Tekirdağ","Tokat","Trabzon","Tunceli","Şanlıurfa","Uşak","Van","Yozgat","Zonguldak","Aksaray","Bayburt","Karaman","Kırıkkale","Batman",
+    "Şırnak","Bartın","Ardahan","Iğdır","Yalova","Karabük","Kilis","Osmaniye","Düzce"
+  ];
+
   void yazigetir(String userId)async{
     await FirebaseFirestore.instance
         .collection('Users')
         .doc(userId)
         .get().then((value) {
       name_surname_current=value.data()!['name']+" "+value.data()!['surname'];
+    });
+  }
+
+  Future<void> getCity(String userId)async{
+    String city="Şehir seçiniz";
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userId)
+        .get().then((value) {
+      city=value.data()!['city'];
+      print(city);
+    });
+    setState(() {
+      dropdownvalue=city;
     });
   }
 
@@ -112,6 +133,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     currentUserId=auth.UserIdbul();
     yazigetir(currentUserId);
+    getCity(currentUserId);
     super.initState();
   }
 
@@ -158,6 +180,7 @@ class _HomePageState extends State<HomePage> {
       orderBy("date",descending: true).
       orderBy("time").snapshots();
       controller.text="";
+      getCity(currentUserId);
     });
   }
 
@@ -308,8 +331,38 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
 
+
+
                 ],
               ),
+              Row(
+                children: [
+                  Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.only(right :15.0),
+                    child: DropdownButton(
+                      value: dropdownvalue,
+                      icon: const Icon(Icons.keyboard_arrow_down),
+                      items: items.map((String items) {
+                          return DropdownMenuItem(
+                            value: items,
+                            child: Text(items),
+                          );
+                        }).toList(),
+
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          dropdownvalue = newValue!;
+                          _usersStream = FirebaseFirestore.instance.
+                          collection('Listings').where("city",isEqualTo: dropdownvalue).snapshots();
+                        });
+                      },
+                    ),
+                  ),
+
+                ],
+              ),
+
 
               Flexible(
                 child: StreamBuilder<QuerySnapshot>(
@@ -331,28 +384,48 @@ class _HomePageState extends State<HomePage> {
                       );
                     }
                     if(snapshot.hasData && snapshot.data?.size==0){
-                      return Container(
-                        child: Padding(
-                          padding: const EdgeInsets.all(30.0),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text("Eşleşen ilan yok",style: TextStyle(fontSize: 20),),
-                              ),
-                              ElevatedButton(
-                                child: Text("Yakın arama yap"),
-                                onPressed: (){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => FindNearestPage(
-                                    place_latlng: place_latlng,
-                                    placename: location,
-                                  )));
-                                },
-                              ),
-                            ],
+                      if(controller.text==""){
+                        return Container(
+                          child: Padding(
+                            padding: const EdgeInsets.all(30.0),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text("Eşleşen ilan yok",style: TextStyle(fontSize: 20),),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      }
+                      else{
+                        return Container(
+                          child: Padding(
+                            padding: const EdgeInsets.all(30.0),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text("Eşleşen ilan yok",style: TextStyle(fontSize: 20),),
+                                ),
+                                ElevatedButton(
+                                  child: Text("Yakın arama yap"),
+                                  onPressed: (){
+                                    if(place_latlng!=null){
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => FindNearestPage(
+                                        place_latlng: place_latlng,
+                                        placename: location,
+                                      )));
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
                     }
 
                     return ListView(
@@ -366,18 +439,21 @@ class _HomePageState extends State<HomePage> {
                         String name_surname=data['name_surname'];
                         String userId=data['user_id'];
                         String coords=data['coord'];
+                        String city=data['city'];
 
-                        return GestureDetector(
-                          onTap: () async {
-                            //TIKLANILDIĞI ZAMAN İLAN DETAY SAYFASINA GİTMESİ İÇİN GESTURE
-                            // TODO DELETE IT LATER
-                            List<LatLng>list=setLocations(coords);
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => DetailedListingPage(
-                              listingId: document.id, coords:coords, list:list,
-                            )));
+                        if (controller.text!=""){
+                            dropdownvalue="Şehir seçiniz";
+                          return GestureDetector(
+                            onTap: () async {
+                              //TIKLANILDIĞI ZAMAN İLAN DETAY SAYFASINA GİTMESİ İÇİN GESTURE
+                              // TODO DELETE IT LATER
+                              List<LatLng>list=setLocations(coords);
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => DetailedListingPage(
+                                listingId: document.id, coords:coords, list:list,
+                              )));
 
                             },
-                          child: buildTripCard(
+                            child: buildTripCard(
                               context,
                               start_location: start_location,
                               end_location: end_location,
@@ -386,8 +462,38 @@ class _HomePageState extends State<HomePage> {
                               price: price,
                               name_surname: name_surname,
                               userId: userId,
-                          ),
-                        );
+                            ),
+                          );
+                        }
+                        else{
+                          if(city==dropdownvalue){
+                            return GestureDetector(
+                              onTap: () async {
+                                //TIKLANILDIĞI ZAMAN İLAN DETAY SAYFASINA GİTMESİ İÇİN GESTURE
+                                // TODO DELETE IT LATER
+                                List<LatLng>list=setLocations(coords);
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailedListingPage(
+                                  listingId: document.id, coords:coords, list:list,
+                                )));
+
+                              },
+                              child: buildTripCard(
+                                context,
+                                start_location: start_location,
+                                end_location: end_location,
+                                date: date,
+                                time: time,
+                                price: price,
+                                name_surname: name_surname,
+                                userId: userId,
+                              ),
+                            );
+                          }
+                          else{
+                            return Container();
+                          }
+
+                        }
                       }).toList(),
                     );
                   },

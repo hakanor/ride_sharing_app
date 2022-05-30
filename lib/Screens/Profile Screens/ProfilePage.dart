@@ -206,6 +206,15 @@ class _ProfilePageState  extends State<ProfilePage> {
                           ),
                         ),
                         SizedBox(height:MediaQuery.of(context).size.height* 0.03),
+                        Container(
+                          child: buildShowUserNameAndEmail(
+                            desc: "Şehir",
+                            text: streamSnapshot.data!['city'],
+                            icon: Icons.create_outlined, onPress: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => CityChangePage(userid2: userid,)));
+                          },
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -563,6 +572,114 @@ class NumberChangePage extends StatelessWidget {
                             .collection('Users')
                             .doc(userid)
                             .update({'number':textEditingControllernumber.text,}).whenComplete((){
+                          Fluttertoast.showToast(msg: "Güncelleme Başarılı");
+                          Navigator.pop(context);}
+                        );
+                      }on FirebaseAuthException catch(error){
+                        String? error_message=error.message;
+                        Fluttertoast.showToast(msg: "Error : $error_message");
+                      }
+                    }
+
+                  }, child: Text("Kaydet")),
+
+                ],
+              ),
+            ),
+          )
+      ),
+    );
+  }
+}
+class CityChangePage extends StatefulWidget {
+  CityChangePage({Key? key, this.userid2}) : super(key: key);
+  final String? userid2;
+
+  @override
+  State<CityChangePage> createState() => _CityChangePageState();
+}
+
+class _CityChangePageState extends State<CityChangePage> {
+  final GlobalKey<FormState> _key = GlobalKey<FormState>();
+
+  final TextEditingController textEditingControllernumber = TextEditingController();
+
+  String dropdownvalue = 'Şehir seçiniz';
+
+  var items = [
+    "Şehir seçiniz","Adana","Adıyaman","Afyon","Ağrı","Amasya","Ankara","Antalya","Artvin","Aydın","Balıkesir","Bilecik","Bingöl","Bitlis","Bolu","Burdur","Bursa","Çanakkale","Çankırı","Çorum",
+    "Denizli","Diyarbakır", "Edirne","Elazığ","Erzincan","Erzurum","Eskişehir","Gaziantep","Giresun","Gümüşhane","Hakkari","Hatay","Isparta","Mersin","İstanbul","İzmir","Kars",
+    "Kastamonu","Kayseri","Kırklareli","Kırşehir","Kocaeli","Konya","Kütahya","Malatya","Manisa","Kahramanmaraş","Mardin","Muğla","Muş","Nevşehir","Niğde","Ordu","Rize","Sakarya",
+    "Samsun","Siirt","Sinop","Sivas","Tekirdağ","Tokat","Trabzon","Tunceli","Şanlıurfa","Uşak","Van","Yozgat","Zonguldak","Aksaray","Bayburt","Karaman","Kırıkkale","Batman",
+    "Şırnak","Bartın","Ardahan","Iğdır","Yalova","Karabük","Kilis","Osmaniye","Düzce"
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    String? userid = widget.userid2;
+
+
+    return Scaffold(
+      appBar: AppBar(title:Text("Şehir Değiştirme"),),
+      body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Form(
+              key: _key,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade400,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            "Yeni şehir:",
+                            style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w400,fontSize: 14),),
+                        ),
+                        DropdownButton(
+                          value: dropdownvalue,
+                          icon: const Icon(Icons.keyboard_arrow_down),
+                          items: items.map((String items) {
+                            return DropdownMenuItem(
+                              value: items,
+                              child: Text(items),
+                            );
+                          }).toList(),
+
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownvalue = newValue!;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+
+                  ElevatedButton(onPressed: (){
+                    if(_key.currentState!.validate()){
+                      _key.currentState!.save();
+
+                      try{
+                        FirebaseFirestore.instance
+                            .collection('Users')
+                            .doc(userid)
+                            .update({'city':dropdownvalue,}).whenComplete((){
                           Fluttertoast.showToast(msg: "Güncelleme Başarılı");
                           Navigator.pop(context);}
                         );

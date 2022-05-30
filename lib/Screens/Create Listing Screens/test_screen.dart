@@ -24,6 +24,7 @@ class _test_screenState extends State<test_screen> {
 
   String location = "Başlangıç Noktası";
   String location2= "Bitiş Noktası";
+  String city="";
 
   var placeid1; // placeid for textfield1
   var placeid2; // placeid for textfield2
@@ -193,6 +194,12 @@ class _test_screenState extends State<test_screen> {
                           );
                           String placeid = place.placeId ?? "0";
                           final detail = await plist.getDetailsByPlaceId(placeid);
+
+                          List splitted = detail.result.formattedAddress!.split(", Turkey");
+                          List splitted2= splitted[0].split("/");
+                          List splitted3= splitted2.last.split(", ");
+                          print(splitted3.last);
+
                           final geometry = detail.result.geometry!;
                           final lat = geometry.location.lat;
                           final lang = geometry.location.lng;
@@ -211,6 +218,7 @@ class _test_screenState extends State<test_screen> {
                           setState(() {
                             markers.add(startMarker);
                             placeid1=placeid;
+                            city=splitted3.last;
                           });
 
                           //move map camera to selected place with animation
@@ -324,9 +332,10 @@ class _test_screenState extends State<test_screen> {
                         else if(placeid2==null){Fluttertoast.showToast(msg: "Bitiş noktası belirtilmek zorunda!");}
                         else{
                           Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(
-                            start_location:location ,
+                            start_location:location,
                             end_location: location2,
                             polylineCoordinates: polylineCoordinates ,
+                            city: city,
                           )));
                         }
 

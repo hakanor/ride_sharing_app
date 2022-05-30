@@ -36,7 +36,7 @@ class _RegisterPageState extends State<RegisterPage> {
       await _firestore
           .collection("Users")
           .doc(user.user!.uid)
-          .set({'name': name,'surname': surname,'number': number, 'email': email,'password':password,"Image":imageurlpp,});
+          .set({'name': name,'surname': surname,'number': number, 'email': email,'password':password,"Image":imageurlpp,"city":"Şehir seçiniz"});
 
       return user.user;
 

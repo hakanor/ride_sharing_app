@@ -8,9 +8,10 @@ import 'package:intl/intl.dart';
 class DetailPage extends StatefulWidget {
 
   String start_location,end_location;
+  String city;
   List<LatLng> polylineCoordinates = [];
 
-  DetailPage({required this.start_location,required this.end_location,required this.polylineCoordinates});
+  DetailPage({required this.start_location,required this.end_location,required this.polylineCoordinates,required this.city});
 
   @override
   _DetailPageState createState() => _DetailPageState();
@@ -69,6 +70,7 @@ class _DetailPageState extends State<DetailPage> {
       String car_model,
       String platenumber,
       String price,
+      String city,
       ) async {
     try{
       var currentUser = await _auth.currentUser;
@@ -92,6 +94,7 @@ class _DetailPageState extends State<DetailPage> {
         "platenumber":platenumber,
         "name_surname":name_surname,
         'coord':coordinates,
+        'city':city,
       });
 
     } on FirebaseAuthException catch(error){
@@ -347,6 +350,7 @@ class _DetailPageState extends State<DetailPage> {
                                   _carmodel.text,
                                   _platenumber.text,
                                   _price.text,
+                                  widget.city,
                                 );
                                 Navigator.popUntil(context, (route) =>route.isFirst);
                                 Fluttertoast.showToast(msg: "İlan başarıyla oluşturuldu.");
