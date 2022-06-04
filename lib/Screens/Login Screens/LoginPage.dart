@@ -235,27 +235,6 @@ class _LoginPageState extends State<LoginPage> {
                                 child: Text("Şifremi unuttum?",style: TextStyle(color: Colors.white),),
                               ),
                             ),
-
-
-
-                            // TEST İŞLEMLERİ İÇİN HIZLI GİRİŞ BUTONU
-                            SizedBox(
-                              height: size.height *0.02,
-                            ),
-                            InkWell(
-                              onTap: () {
-                                _emailController.text="hakanor1@gmail.com";
-                                _passwordController.text="123Hakan";
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(vertical: 5),
-
-                                child: Text("TEST",style: TextStyle(color: Colors.white),),
-                              ),
-                            ),
-                            // TEST İŞLEMLERİ İÇİN HIZLI GİRİŞ BUTONU
-
-
                           ],
                         ),
                       ),
