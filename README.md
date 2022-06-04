@@ -12,6 +12,8 @@ Firebase is used for storage, realtime database.
 - 2- If there is no listing from feature #1, Application searches routes among all the listings, if searched location in a route, application shows that listing.
 - 3- Application filters listings from 2nd feature, orderBy distance ascending from device location.
 
+[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://www.youtube.com/shorts/RdR2i6Ct6nE)
+
 ## Prerequisites
 - keys.xml file on Android > App > src > main > res > values
 ``` 
