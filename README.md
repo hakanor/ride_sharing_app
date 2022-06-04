@@ -3,6 +3,11 @@ The purpose of Ride_Sharing_App is to help users share their cars with passenger
 
 ![image](https://user-images.githubusercontent.com/52280308/172013204-ed3229cc-9805-42e2-9dc4-641389492547.png)
 
+<img width="240" alt="chat" src="https://user-images.githubusercontent.com/52280308/172014768-a2ea5d1b-20e0-4914-8af1-d264655d2a44.png">
+
+<img width="240" alt="Screen Shot 2022-06-04 at 18 34 51" src="https://user-images.githubusercontent.com/52280308/172014852-dd3a0ae3-7201-4a42-a644-bf87c5923e8f.png">
+
+
 ## Description
 Map methods were coded with Flutter and Google Maps API.
 Places API is used for autocomplete in address search.
@@ -10,15 +15,18 @@ Firebase is used for storage, realtime database.
 
 ## Prerequisites
 - keys.xml file on Android > App > src > main > res > values
-- ``` 
+``` 
   <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="google_maps_key" translatable="false"    templateMergeStrategy="preserve">
-        YOUR_GOOGLE_MAP_KEY_HERE
+        YOUR_GOOGLE_MAP_API_KEY_HERE
     </string>
 </resources>
-  ```
-
+ ```
+- .env file on main directory
+```
+GOOGLE_API_KEY=YOUR_API_KEY_HERE
+```
 
 
 ## Screenshots
