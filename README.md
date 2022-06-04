@@ -27,6 +27,8 @@ GOOGLE_API_KEY=YOUR_API_KEY_HERE
 
 
 ## Screenshots
+All screenshots from ride_sharing_app
+
 ###All Listings
 <img width="436" alt="Screen Shot 2022-06-04 at 18 02 09" src="https://user-images.githubusercontent.com/52280308/172015341-fcc69074-42eb-4d89-80c5-52a625b14235.png">
 
