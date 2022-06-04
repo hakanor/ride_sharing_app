@@ -9,7 +9,7 @@ Places API is used for autocomplete in address search.
 Firebase is used for storage, realtime database.
 
 ## Prerequisites
-- keys.xml file on Android > App > src > main > res > values```
+- keys.xml file on Android > App > src > main > res > values
 - ``` 
   <?xml version="1.0" encoding="utf-8"?>
 <resources>
