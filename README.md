@@ -7,6 +7,11 @@ Map methods were coded with Flutter and Google Maps API.
 Places API is used for autocomplete in address search.
 Firebase is used for storage, realtime database.
 
+## Features
+- 1- The user searches for location which they want to go, the application filters among the all listings which user want to go.
+- 2- If there is no listing from feature #1, Application searches routes among all the listings, if searched location in a route, application shows that listing.
+- 3- Application filters listings from 2nd feature, orderBy distance ascending from device location.
+
 ## Prerequisites
 - keys.xml file on Android > App > src > main > res > values
 ``` 
@@ -35,10 +40,10 @@ All screenshots from ride_sharing_app
 ### Autocomplete Search
 <img width="480" alt="Screen Shot 2022-06-04 at 18 34 51" src="https://user-images.githubusercontent.com/52280308/172015363-da3acc07-529e-424c-975d-9f8de78f2b2c.png">
 
-### Search Listing with End Location
+### Listings with Search via by Destination Location
 <img width="480" alt="Screen Shot 2022-06-04 at 18 35 03" src="https://user-images.githubusercontent.com/52280308/172015389-a58eb76f-ad2f-4dfb-b768-62969fb0fa0c.png">
 
-### Search Listings by device location
+### Search Listings by Device Location
 <img width="480" alt="Screen Shot 2022-06-04 at 18 36 15" src="https://user-images.githubusercontent.com/52280308/172015420-e9a4bda6-2822-443b-97d2-92e9605e902e.png">
 
 ### Chat Screen
