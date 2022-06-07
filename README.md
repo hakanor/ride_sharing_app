@@ -14,6 +14,9 @@ Firebase is used for storage, realtime database.
 
 <img width="480" alt="Screen Shot 2022-06-04 at 18 02 39" src="https://user-images.githubusercontent.com/52280308/172019870-9d2bdffe-e05c-46d8-a1a8-e5d321cc2dff.gif">
 
+- Used Haversine Formula to Calculate Distance Between 2 Locations
+- <img width="480" alt="raycast-untitled" src="https://user-images.githubusercontent.com/52280308/172492766-ca72805f-71a5-4c0d-b0ae-d1c0d812f243.png">
+
 ## Prerequisites
 - keys.xml file on Android > App > src > main > res > values
 ``` 
