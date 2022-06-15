@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
@@ -38,7 +39,7 @@ class _test_screenState extends State<test_screen> {
   String start_location="";
   String end_location="";
 
-  // konumu dışarıdan girerek arama yapılmasını sağlıyor
+  // konumu dışarıdan girerek yakın çevrede arama yapılmasını sağlıyor
   Future <List<String>> searchNearbyService(var lat, var lng) async{
     var dio= Dio();
     var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
@@ -52,7 +53,16 @@ class _test_screenState extends State<test_screen> {
     return response.data['results'].map<String>((result)=>result['name'].toString()).toList();
   }
 
-  //
+  Future<void> GetAddressFromLatLong(LatLng position)async {
+    List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude,localeIdentifier: "tr");
+    print(placemarks);
+    Placemark place = placemarks[0];
+    //Address = '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
+    setState(()  {
+      location = '${place.street} Mah, ${place.thoroughfare}';
+      city= place.administrativeArea!;
+    });
+  }
 
   // ------------------- marker işlemleri ------------------------------------//
   Set<Marker> markers = Set<Marker>(); // Marker list
@@ -130,7 +140,6 @@ class _test_screenState extends State<test_screen> {
                   });
                 },
               ),
-
 
               //TEXTFIELD 1
               Positioned(  //search input bar
@@ -210,8 +219,10 @@ class _test_screenState extends State<test_screen> {
                                       child: Padding(padding: const EdgeInsets.only(right:10),
                                         child: Row(children: [Text("Konumu Kullan"),Icon(Icons.location_on)],)),
                                       onTap: () async{
+                                        GetAddressFromLatLong(widget.current_location_latlng);
                                         List nearLocations;
                                         nearLocations = await searchNearbyService(widget.current_location_latlng.latitude, widget.current_location_latlng.longitude);
+                                        nearLocations.insert(0,location);
                                         return showDialog(
                                             context: context,
                                             builder: (BuildContext context) {
@@ -225,11 +236,13 @@ class _test_screenState extends State<test_screen> {
                                                     itemBuilder: (BuildContext context, int index) {
                                                       return ListTile(
                                                         title: Text(nearLocations[index]),
+                                                        trailing: index == 0?
+                                                        Icon(Icons.location_on,color: Colors.red,) //code if above statement is true
+                                                            : null,
                                                         onTap: () {
                                                           setState(() {
                                                             location=nearLocations[index];
                                                             place1=widget.current_location_latlng;
-
 
                                                             final Marker startMarker = Marker(
                                                               markerId: MarkerId("_kStartMarker"),

@@ -295,7 +295,7 @@ class _DetailPageState extends State<DetailPage> {
                 ),
 
                 Padding(
-                  padding: const EdgeInsets.only(left:0,top: 0),
+                  padding: const EdgeInsets.only(left:16,top: 0),
                   child: Row(
                     children: [
 
