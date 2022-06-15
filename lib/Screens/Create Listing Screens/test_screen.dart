@@ -169,7 +169,6 @@ class _test_screenState extends State<test_screen> {
                           List splitted = detail.result.formattedAddress!.split(", Turkey");
                           List splitted2= splitted[0].split("/");
                           List splitted3= splitted2.last.split(", ");
-                          print(splitted3.last);
 
                           final geometry = detail.result.geometry!;
                           final lat = geometry.location.lat;
@@ -177,7 +176,6 @@ class _test_screenState extends State<test_screen> {
                           var newlatlang = LatLng(lat, lang);
                           place1=newlatlang;
 
-                          //setMarker(newlatlang);
 
                           final Marker startMarker = Marker(
                             markerId: MarkerId("_kStartMarker"),
@@ -212,7 +210,6 @@ class _test_screenState extends State<test_screen> {
                                       child: Padding(padding: const EdgeInsets.only(right:10),
                                         child: Row(children: [Text("Konumu Kullan"),Icon(Icons.location_on)],)),
                                       onTap: () async{
-                                        print("AAA");
                                         List nearLocations;
                                         nearLocations = await searchNearbyService(widget.current_location_latlng.latitude, widget.current_location_latlng.longitude);
                                         return showDialog(
@@ -231,8 +228,6 @@ class _test_screenState extends State<test_screen> {
                                                         onTap: () {
                                                           setState(() {
                                                             location=nearLocations[index];
-                                                            print(nearLocations[index]);
-
                                                             place1=widget.current_location_latlng;
 
 
@@ -260,7 +255,6 @@ class _test_screenState extends State<test_screen> {
                                                 ),
                                               );
                                             });
-                                        print(nearLocations);
                                       },
                                     ),
                                     Icon(Icons.search),
@@ -311,7 +305,7 @@ class _test_screenState extends State<test_screen> {
                           List splitted = detail.result.formattedAddress!.split(", Turkey");
                           List splitted2= splitted[0].split("/");
                           List splitted3= splitted2.last.split(", ");
-                          city2=splitted2.last;
+                          city2=splitted3.last;
 
                           final geometry = detail.result.geometry!;
                           final lat = geometry.location.lat;
