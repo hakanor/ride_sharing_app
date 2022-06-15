@@ -179,15 +179,21 @@ class _PersonalAdsState extends State<MyListingsPage> {
 
               // KALKIŞ NOKTASI
               Padding(
-                padding: const EdgeInsets.only(top: 8.0,bottom: 6),
-                child: Row(children: <Widget>[
-                  Icon(Icons.radio_button_checked,color: Colors.blue,),
-                  Padding(
-                    padding: const EdgeInsets.only(left:4.0),
-                    child: Text(start_location, style: new TextStyle(fontSize: 17.0),),
-                  ),
-                  //Spacer(),
-                ]),
+                  padding: const EdgeInsets.only(top: 8.0,bottom: 6),
+                  child: Row(children: <Widget>[
+                    Icon(Icons.radio_button_checked,color: Colors.blue,),
+                    Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left :4.0),
+                          child: Text(
+                            start_location,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: new TextStyle(fontSize: 17.0),
+                          ),
+                        )
+                    ),
+                  ])
               ),
 
               // DOTTED LİNE
@@ -221,15 +227,21 @@ class _PersonalAdsState extends State<MyListingsPage> {
 
               // VARIŞ NOKTASI
               Padding(
-                padding: const EdgeInsets.only(bottom: 4.0),
-                child: Row(children: <Widget>[
-                  const Icon(Icons.location_on,color: Colors.red,),
-                  Padding(
-                    padding: const EdgeInsets.only(left:4.0),
-                    child: Text(end_location, style: new TextStyle(fontSize: 17.0),),
-                  ),
-                  //Spacer(),
-                ]),
+                  padding: const EdgeInsets.only(top: 8.0,bottom: 6),
+                  child: Row(children: <Widget>[
+                    const Icon(Icons.location_on,color: Colors.red,),
+                    Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left :4.0),
+                          child: Text(
+                            end_location,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: new TextStyle(fontSize: 17.0),
+                          ),
+                        )
+                    ),
+                  ])
               ),
 
               // SAAT - TARİH

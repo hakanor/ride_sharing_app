@@ -46,7 +46,7 @@ class _test_screenState extends State<test_screen> {
     var parameters={
       'key':googleApikey,
       'location':'$lat,$lng',
-      'radius':100,
+      'radius':55,
       'language':"tr",
     };
     var response = await dio.get(url,queryParameters: parameters);

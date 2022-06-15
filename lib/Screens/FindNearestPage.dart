@@ -259,61 +259,6 @@ class _FindNearestPageState extends State<FindNearestPage> {
                     ),
                   ),
                 ),
-/*
-                Flexible(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: _usersStream,
-                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Error');
-                      }
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Text("Yükleniyor");
-                      }
-                      return ListView(
-                        children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                          Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-                          String start_location=data['start_location'];
-                          String end_location=data['end_location'];
-                          String date=data['date'];
-                          String time=data['time'];
-                          String price=data['price'];
-                          String name_surname=data['name_surname'];
-                          String userId=data['user_id'];
-
-                          String coord=data['coord'];
-                          var splitted=coord.split('/');
-                          for(int i=0; i<splitted.length-1; i++){
-                            String x = splitted[i];
-                            var splitted2=x.split('-');
-                            double result=calculateDistance(widget.place_latlng.latitude, widget.place_latlng.longitude, double.parse(splitted2[0]), double.parse(splitted2[1]));
-                            print(result);
-                            if(result<1 && start_location!= widget.placename){
-                              print("Bulundu!");
-                              return GestureDetector(
-                                onTap: (){
-                                  Fluttertoast.showToast(msg: document.id);
-                                },
-                                child: buildTripCard(
-                                  context,
-                                  start_location: start_location,
-                                  end_location: end_location,
-                                  date: date,
-                                  time: time,
-                                  price: price,
-                                  name_surname: name_surname,
-                                  userId: userId,
-                                ),
-                              );
-                            }
-                          }
-                          return Container();
-                        }).toList(),
-
-                      );
-                    },
-                  ),
-                )*/
 
                 Flexible(
                   child: StreamBuilder<QuerySnapshot>(
@@ -377,7 +322,7 @@ class _FindNearestPageState extends State<FindNearestPage> {
                             i--;
                           }
                         }
-                        //x.sort((a,b)=> a!.minresult.compareTo(b!.minresult));
+
                         return ListView.builder(
                             itemCount: x.length,
                             itemBuilder: (context,index){
@@ -394,7 +339,6 @@ class _FindNearestPageState extends State<FindNearestPage> {
                                   userId: item.userId,
                                 ),
                                 onTap: (){
-                                  //TODO TIKLANDILIĞI ZAMAN GİTMESİ İÇİN
                                   List<LatLng>list=setLocations(item.coord);
                                   Navigator.push(context, MaterialPageRoute(builder: (context) => DetailedListingPage(
                                     listingId: item.doc_id, coords:item.coord, list:list,
@@ -436,15 +380,21 @@ class _FindNearestPageState extends State<FindNearestPage> {
 
               // KALKIŞ NOKTASI
               Padding(
-                padding: const EdgeInsets.only(top: 8.0,bottom: 6),
-                child: Row(children: <Widget>[
-                  Icon(Icons.radio_button_checked,color: Colors.blue,),
-                  Padding(
-                    padding: const EdgeInsets.only(left:4.0),
-                    child: Text(start_location, style: new TextStyle(fontSize: 17.0),),
-                  ),
-                  //Spacer(),
-                ]),
+                  padding: const EdgeInsets.only(top: 8.0,bottom: 6),
+                  child: Row(children: <Widget>[
+                    Icon(Icons.radio_button_checked,color: Colors.blue,),
+                    Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left :4.0),
+                          child: Text(
+                            start_location,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: new TextStyle(fontSize: 17.0),
+                          ),
+                        )
+                    ),
+                  ])
               ),
 
               // DOTTED LİNE
@@ -478,15 +428,21 @@ class _FindNearestPageState extends State<FindNearestPage> {
 
               // VARIŞ NOKTASI
               Padding(
-                padding: const EdgeInsets.only(bottom: 4.0),
-                child: Row(children: <Widget>[
-                  const Icon(Icons.location_on,color: Colors.red,),
-                  Padding(
-                    padding: const EdgeInsets.only(left:4.0),
-                    child: Text(end_location, style: new TextStyle(fontSize: 17.0),),
-                  ),
-                  //Spacer(),
-                ]),
+                  padding: const EdgeInsets.only(top: 8.0,bottom: 6),
+                  child: Row(children: <Widget>[
+                    const Icon(Icons.location_on,color: Colors.red,),
+                    Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left :4.0),
+                          child: Text(
+                            end_location,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: new TextStyle(fontSize: 17.0),
+                          ),
+                        )
+                    ),
+                  ])
               ),
 
               // SAAT - TARİH

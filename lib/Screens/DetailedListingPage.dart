@@ -92,32 +92,6 @@ class _DetailedListingPageState extends State<DetailedListingPage> {
       );
     });
   }
-  /* NO NEED THIS FUNC. ANYMORE
-  void setPolylines() async{
-    _polylines.clear();
-    polylineCoordinates.clear();
-
-    PolylineResult result=await polylinePoints.getRouteBetweenCoordinates(
-      googleApikey!,
-      PointLatLng(place1.latitude, place1.longitude),
-      PointLatLng(place2.latitude, place2.longitude),
-    );
-    print(result.status);
-    print(result.errorMessage);
-    if (result.status=='OK'){
-      result.points.forEach((PointLatLng point) {polylineCoordinates.add(LatLng(point.latitude, point.longitude)); });
-    }
-    setState(() {
-      _polylines.add(
-          Polyline(
-            width: 6,
-            polylineId: PolylineId('polyLine'),
-            color: Color(0xFF08A5CB),
-            points: polylineCoordinates,
-          )
-      );
-    });
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -210,15 +184,21 @@ Widget buildListingCard(
         child: Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(top: 8.0,bottom: 6),
-              child: Row(children: <Widget>[
-                Icon(Icons.radio_button_checked,color: Colors.blue,),
-                Padding(
-                  padding: const EdgeInsets.only(left:4.0),
-                  child: Text(snapshot.data!['start_location'], style: new TextStyle(fontSize: 17.0),),
-                ),
-                //Spacer(),
-              ]),
+                padding: const EdgeInsets.only(top: 8.0,bottom: 6),
+                child: Row(children: <Widget>[
+                  Icon(Icons.radio_button_checked,color: Colors.blue,),
+                  Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left :4.0),
+                        child: Text(
+                          snapshot.data!['start_location'],
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: new TextStyle(fontSize: 17.0),
+                        ),
+                      )
+                  ),
+                ])
             ),
 
             // DOTTED LİNE
@@ -253,15 +233,21 @@ Widget buildListingCard(
 
             // VARIŞ NOKTASI
             Padding(
-              padding: const EdgeInsets.only(bottom: 4.0),
-              child: Row(children: <Widget>[
-                const Icon(Icons.location_on,color: Colors.red,),
-                Padding(
-                  padding: const EdgeInsets.only(left:4.0),
-                  child: Text(snapshot.data!['end_location'], style: new TextStyle(fontSize: 17.0),),
-                ),
-                //Spacer(),
-              ]),
+                padding: const EdgeInsets.only(top: 8.0,bottom: 6),
+                child: Row(children: <Widget>[
+                  const Icon(Icons.location_on,color: Colors.red,),
+                  Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left :4.0),
+                        child: Text(
+                          snapshot.data!['end_location'],
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: new TextStyle(fontSize: 17.0),
+                        ),
+                      )
+                  ),
+                ])
             ),
 
             Padding(
