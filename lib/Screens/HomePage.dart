@@ -7,11 +7,9 @@ import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/directions.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:ride_sharing_app/Screens/DetailedListingPage.dart';
 import 'package:ride_sharing_app/Services/auth_service.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'Chat Screens/ConversationPage.dart';
 import 'FindNearestPage.dart';
 
@@ -142,27 +140,6 @@ class _HomePageState extends State<HomePage> {
   collection('Listings').
   orderBy("date",descending: true).
   orderBy("time").snapshots();
-
-  Future<void> _makePhoneCall(String phoneNumber) async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
-    await launchUrl(launchUri);
-  }
-
-
-  Future<String> getPhoneNumber (String userid) async {
-    String number="";
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(userid)
-        .get().then((value) {
-      number=value.data()!['number'];
-    });
-    return number;
-  }
-
 
   void search(String text){
       setState(() {
@@ -446,7 +423,6 @@ class _HomePageState extends State<HomePage> {
                           return GestureDetector(
                             onTap: () async {
                               //TIKLANILDIĞI ZAMAN İLAN DETAY SAYFASINA GİTMESİ İÇİN GESTURE
-                              // TODO DELETE IT LATER
                               List<LatLng>list=setLocations(coords);
                               Navigator.push(context, MaterialPageRoute(builder: (context) => DetailedListingPage(
                                 listingId: document.id, coords:coords, list:list,
@@ -470,7 +446,6 @@ class _HomePageState extends State<HomePage> {
                             return GestureDetector(
                               onTap: () async {
                                 //TIKLANILDIĞI ZAMAN İLAN DETAY SAYFASINA GİTMESİ İÇİN GESTURE
-                                // TODO DELETE IT LATER
                                 List<LatLng>list=setLocations(coords);
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => DetailedListingPage(
                                   listingId: document.id, coords:coords, list:list,
@@ -680,7 +655,7 @@ class _HomePageState extends State<HomePage> {
                         )));
                       }
                       else if(userId==currentUserId){
-                        Fluttertoast.showToast(msg: "Kendinize mesaj gönderemezsiniz!"); //TODO DELETE IT LATER
+                        Fluttertoast.showToast(msg: "Kendinize mesaj gönderemezsiniz!");
                       }
                       else{
                         var documentRef = await ref.add(

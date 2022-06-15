@@ -1,3 +1,5 @@
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ride_sharing_app/Screens/Chat%20Screens/MainChatPage.dart';
 import 'package:ride_sharing_app/Screens/Create%20Listing%20Screens/test_screen.dart';
 import 'package:ride_sharing_app/Screens/MyListingsPage.dart';
@@ -16,20 +18,52 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  late Position position;
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    return await Geolocator.getCurrentPosition();
+  }
+
+  Future <void> updatePosition() async {
+    position = await _determinePosition();
+  }
 
   AuthService _authService = AuthService();
   final List<Widget> _children=[
     HomePage(),
     MyListingsPage(),
-    test_screen(),
+    test_screen(current_location_latlng: LatLng(0,0),),
     MainChatPage(),
     ProfilePage(),
   ];
   int _currentIndex=0;
 
-  onTabTapped(int index){
+  onTabTapped(int index)async{
     if(index==2){
-      Navigator.push(context, MaterialPageRoute(builder: (context) => test_screen()));
+      await updatePosition();
+      LatLng x = new LatLng(position.latitude,position.longitude);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => test_screen(current_location_latlng: x,)));
     }
     else{
     setState(() {

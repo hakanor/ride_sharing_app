@@ -10,7 +10,8 @@ import 'package:google_maps_webservice/places.dart';
 import 'package:ride_sharing_app/Screens/Create%20Listing%20Screens/test_detail.dart';
 
 class test_screen extends StatefulWidget {
-  const test_screen({Key? key}) : super(key: key);
+  final LatLng current_location_latlng;
+  const test_screen({Key? key,required this.current_location_latlng}) : super(key: key);
 
   @override
   _test_screenState createState() => _test_screenState();
@@ -25,6 +26,7 @@ class _test_screenState extends State<test_screen> {
   String location = "Başlangıç Noktası";
   String location2= "Bitiş Noktası";
   String city="";
+  String city2="";
 
   var placeid1; // placeid for textfield1
   var placeid2; // placeid for textfield2
@@ -36,38 +38,6 @@ class _test_screenState extends State<test_screen> {
   String start_location="";
   String end_location="";
 
-  // Konya kulesite önü lat lang
-  static const nycLat=37.88860206217567;
-  static const nycLng=32.49354872609671;
-
-
-  // verilen keyword ile belirli konumda arama yapılmasını sağlıyor
-  Future <List<String>> searchNearby(String keyword) async{
-    var dio= Dio();
-    var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
-    var parameters={
-      'key':googleApikey,
-      'location':'$nycLat,$nycLng',
-      'radius':'800',
-      'keyword':keyword,
-    };
-    var response = await dio.get(url,queryParameters: parameters);
-    return response.data['results'].map<String>((result)=>result['name'].toString()).toList();
-  }
-
-  // keyword olmadan konumda arama yapılmasını sağlıyor
-  Future <List<String>> searchNearbyWithout() async{
-    var dio= Dio();
-    var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
-    var parameters={
-      'key':googleApikey,
-      'location':'$nycLat,$nycLng',
-      'radius':'800',
-    };
-    var response = await dio.get(url,queryParameters: parameters);
-    return response.data['results'].map<String>((result)=>result['name'].toString()).toList();
-  }
-
   // konumu dışarıdan girerek arama yapılmasını sağlıyor
   Future <List<String>> searchNearbyService(var lat, var lng) async{
     var dio= Dio();
@@ -75,7 +45,8 @@ class _test_screenState extends State<test_screen> {
     var parameters={
       'key':googleApikey,
       'location':'$lat,$lng',
-      'radius':'800',
+      'radius':100,
+      'language':"tr",
     };
     var response = await dio.get(url,queryParameters: parameters);
     return response.data['results'].map<String>((result)=>result['name'].toString()).toList();
@@ -91,7 +62,7 @@ class _test_screenState extends State<test_screen> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    startLocation=widget.current_location_latlng;
     polylinePoints = PolylinePoints();
     super.initState();
   }
@@ -150,7 +121,7 @@ class _test_screenState extends State<test_screen> {
                 polylines: _polylines,
                 initialCameraPosition: CameraPosition( //innital position in map
                   target: startLocation, //initial position
-                  zoom: 14.0, //initial zoom level
+                  zoom: 17.0, //initial zoom level
                 ),
                 mapType: MapType.normal, //map type
                 onMapCreated: (controller) { //method called when map is created
@@ -232,10 +203,70 @@ class _test_screenState extends State<test_screen> {
                               padding: EdgeInsets.all(0),
                               width: MediaQuery.of(context).size.width - 40,
                               child: ListTile(
-                                title:Text(location, style: TextStyle(fontSize: 17),),
-                                trailing: Icon(Icons.search),
                                 dense: true,
-                              )
+                                title:Text(location, style: TextStyle(fontSize: 17),),
+                                trailing: Row(
+                                  mainAxisSize:MainAxisSize.min,
+                                  children: [
+                                    GestureDetector(
+                                      child: Padding(padding: const EdgeInsets.only(right:10),
+                                        child: Row(children: [Text("Konumu Kullan"),Icon(Icons.location_on)],)),
+                                      onTap: () async{
+                                        print("AAA");
+                                        List nearLocations;
+                                        nearLocations = await searchNearbyService(widget.current_location_latlng.latitude, widget.current_location_latlng.longitude);
+                                        return showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text('En Uygun Konumu Seçin'),
+                                                content: Container(
+                                                  width: double.minPositive,
+                                                  child: ListView.builder(
+                                                    shrinkWrap: true,
+                                                    itemCount: nearLocations.length,
+                                                    itemBuilder: (BuildContext context, int index) {
+                                                      return ListTile(
+                                                        title: Text(nearLocations[index]),
+                                                        onTap: () {
+                                                          setState(() {
+                                                            location=nearLocations[index];
+                                                            print(nearLocations[index]);
+
+                                                            place1=widget.current_location_latlng;
+
+
+                                                            final Marker startMarker = Marker(
+                                                              markerId: MarkerId("_kStartMarker"),
+                                                              infoWindow: InfoWindow(title: "Başlangıç Noktası"),
+                                                              icon: BitmapDescriptor.defaultMarker,
+                                                              position: widget.current_location_latlng, // ex loc 1 pos
+                                                            );
+
+                                                            setState(() {
+                                                              markers.add(startMarker);
+                                                              placeid1=location;
+                                                            });
+
+                                                            //move map camera to selected place with animation
+                                                            mapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: widget.current_location_latlng, zoom: 17)));
+
+                                                          });
+                                                          Navigator.pop(context, nearLocations[index]);
+                                                        },
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                        print(nearLocations);
+                                      },
+                                    ),
+                                    Icon(Icons.search),
+                                  ],
+                                ),
+                              ),
                           ),
                         ),
                       )
@@ -276,6 +307,12 @@ class _test_screenState extends State<test_screen> {
                           );
                           String placeid = place.placeId ?? "0";
                           final detail = await plist.getDetailsByPlaceId(placeid);
+
+                          List splitted = detail.result.formattedAddress!.split(", Turkey");
+                          List splitted2= splitted[0].split("/");
+                          List splitted3= splitted2.last.split(", ");
+                          city2=splitted2.last;
+
                           final geometry = detail.result.geometry!;
                           final lat = geometry.location.lat;
                           final lang = geometry.location.lng;
@@ -335,14 +372,9 @@ class _test_screenState extends State<test_screen> {
                             start_location:location,
                             end_location: location2,
                             polylineCoordinates: polylineCoordinates ,
-                            city: city,
+                            city: city==""?city2 : city,
                           )));
                         }
-
-                        /*Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                            DetailPage(
-                              start_location:location , end_location: location2,
-                            )));*/
                       },
                   )
               ),
